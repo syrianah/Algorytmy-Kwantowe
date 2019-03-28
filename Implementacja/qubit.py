@@ -4,6 +4,20 @@ import random
 
 from complex import Complex, PolarToComplex
 
+def P0(qubit):
+    return abs(qubit.alpha)**2
+
+def P1(qubit):
+    return abs(qubit.beta)**2
+
+def Qubit_after_measure(qubit):
+    if P0(qubit)>P1(qubit):
+        alfa=qubit.alpha/abs(qubit.alpha)
+        return Qubit(alfa,Complex(0,0))
+    else:
+        bet=qubit.beta/abs(qubit.beta)
+        return Qubit(Complex(0,0),bet)
+
 def randomQ():
     a = random.uniform(-1, 1)
     b = random.uniform(-1, 1)
@@ -67,8 +81,11 @@ class Qubit:
         return Qubit(alpha, beta)
 
 
+m1 = np.array([[Complex(1, 0), Complex(0, 0)],
+                [Complex(0, 0), Complex(0, 0)]])
 
-
+m2 = np.array([[Complex(0, 0), Complex(0, 0)],
+                [Complex(0, 0), Complex(1, 0)]])
 
 # print(0.4677056485736148 + 0.5322943514263851)
 a = Complex(1/np.sqrt(2), 0)
@@ -76,6 +93,9 @@ a = Complex(1/np.sqrt(2), 0)
 # # print(a**2+a**2)
 # # print(a)
 q = Qubit(a, a)
+qM = Qubit_after_measure(q)
+print(qM.alpha)
+print(qM.beta)
 # # q1 = Qubit.randomQ()
 # q1 = randomQ()
 # print(q.alpha)
@@ -103,8 +123,8 @@ new_qY = new_qX * PY
 # print(new_qH.beta)
 # print(new_qX.alpha)
 # print(new_qX.beta)
-print(new_qY.alpha)
-print(new_qY.beta)
+# print(new_qY.alpha)
+# print(new_qY.beta)
 
 # Tg = q * PZ
 # print(Tg.alpha)
