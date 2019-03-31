@@ -18,6 +18,17 @@ def Qubit_after_measure(qubit):
         bet=qubit.beta/abs(qubit.beta)
         return Qubit(Complex(0,0),bet)
 
+def Measure(qubit):
+    if P0(qubit) > P1(qubit):
+        return 0
+    elif P0(qubit) < P1(qubit):
+        return 1
+    else:
+        R = random(0, 1)
+        if R < 0.5:
+            return 0
+        else: return 1
+
 def randomQ():
     a = random.uniform(-1, 1)
     b = random.uniform(-1, 1)
@@ -94,8 +105,8 @@ a = Complex(1/np.sqrt(2), 0)
 # # print(a)
 q = Qubit(a, a)
 qM = Qubit_after_measure(q)
-print(qM.alpha)
-print(qM.beta)
+# print(qM.alpha)
+# print(qM.beta)
 # # q1 = Qubit.randomQ()
 # q1 = randomQ()
 # print(q.alpha)
@@ -116,9 +127,11 @@ SNG = SNgate()
 TNG = TNgate()
 
 new_qH = q * H
+print(Measure(new_qH))
 
 new_qX = new_qH * PX
 new_qY = new_qX * PY
+# print(Measure(new_qY))
 # print(new_qH.alpha)
 # print(new_qH.beta)
 # print(new_qX.alpha)
