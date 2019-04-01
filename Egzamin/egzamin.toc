@@ -1,0 +1,3 @@
+\contentsline {section}{\numberline {1}Liczby zespolone}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Posta\IeC {\'c} Algebraiczna}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Posta\IeC {\'c} trygonometryczna}{2}{subsection.1.2}

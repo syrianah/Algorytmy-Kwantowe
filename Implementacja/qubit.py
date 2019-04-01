@@ -15,17 +15,22 @@ def Qubit_after_measure(qubit):
         alfa=qubit.alpha/abs(qubit.alpha)
         return Qubit(alfa,Complex(0,0))
     else:
-        bet=qubit.beta/abs(qubit.beta)
-        return Qubit(Complex(0,0),bet)
+        beta = qubit.beta/abs(qubit.beta)
+        return Qubit(Complex(0,0), beta)
 
 def Measure(qubit):
     if P0(qubit) > P1(qubit):
-        return 0
+        P = random.uniform(0, 1)
+        if P < P0(qubit):
+            return 0
+        else: return 1
     elif P0(qubit) < P1(qubit):
-        return 1
+        if P < P1(qubit):
+            return 1
+        else: return 0
     else:
-        R = random.uniform(0, 1)
-        if R < 0.5:
+        P = random.uniform(0, 1)
+        if P < 0.5:
             return 0
         else: return 1
 
@@ -104,7 +109,7 @@ a = Complex(1/np.sqrt(2), 0)
 # # print(a**2+a**2)
 # # print(a)
 q = Qubit(a, a)
-print(Measure(q))
+# print(Measure(q))
 qM = Qubit_after_measure(q)
 # print(qM.alpha)
 # print(qM.beta)
@@ -132,13 +137,13 @@ new_qH = q * H
 
 new_qX = new_qH * PX
 new_qY = new_qX * PY
-# print(Measure(new_qY))
+print(Measure(new_qY))
 # print(new_qH.alpha)
 # print(new_qH.beta)
 # print(new_qX.alpha)
 # print(new_qX.beta)
-# print(new_qY.alpha)
-# print(new_qY.beta)
+print(new_qY.alpha)
+print(new_qY.beta)
 
 # Tg = q * PZ
 # print(Tg.alpha)

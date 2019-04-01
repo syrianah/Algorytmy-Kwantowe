@@ -13,9 +13,12 @@
 \usepackage{textcomp}
 \usepackage{amssymb}
 \usepackage{capt-of}
+\usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{geometry}
 \usepackage{tikz}
+\usepackage{ dsfont }
+
 
  \geometry{
  a4paper,
@@ -31,12 +34,49 @@
     urlcolor=cyan,
 }
 
-\title{\textbf{Procedura ziarna w formie}}
+\title{\textbf{Algorytmów Kwantowych}}
 \author{Wojciech Kubiak}
 \date{\today}
 
 \begin{document}
 
 \maketitle
+
+\tableofcontents
+
+\section{Liczby zespolone}
+Zbiór liczb zespolonych oznaczamy $\mathds{C}$
+
+\subsection{Postać Algebraiczna}
+\begin{itemize}
+    \item \textbf{Podstawowe informacje:}
+    \begin{center}
+        $\alpha = a + bi$ , \quad a, b $\in \mathds{R}$ , \quad i $= \sqrt{-1}$ \\
+        Re$(\alpha) =$ a \quad - część rzeczywist \\
+        Im$(\alpha) =$ b \quad - część urojona
+    \end{center}
+    \item \textbf{Operacje $\pmb(\mathds{C}, +, -, *, /)$:}
+    \begin{center}
+        $\alpha = a + bi$ \quad $\beta = c + di$
+    \end{center}
+    \begin{itemize}
+        \item $(+)$ $\alpha + \beta = (a + bi) + (c + di) = (a + c) + (b + d)i$
+        \item $(-)$ $\alpha - \beta = (a + bi) - (c + di) = (a - c) + (b - d)i$
+        \item $(*)$ $\alpha * \beta = (a + bi) * (c + di) = ac + adi + cbi + bdi^2 = ac + adi + abi - bd = (ac - bd) + (ad + cb)i$
+        \item $(/)$ $\frac{\alpha}{\beta} = \frac{(a+bi)(c-di)}{(c+di)(c-di)} = \frac{ac - adi + abi + bd}{c^2 + b^2} = (\frac{ac + bd}{c^2 + b^2}) + (\frac{bc - ad}{c^2 + b^2})i$
+    \end{itemize}
+\end{itemize}
+
+\subsection{Postać trygonometryczna}
+\begin{itemize}
+    \item \textbf{Podstawowe informacje:}
+    \begin{tikzpicture}
+        \draw[thick,->] (0,0) -- (4.5,0) node[anchor=north west] {Re};
+        \draw[thick,->] (0,0) -- (0,4.5) node[anchor=south east] {Im};
+        \draw [dashed] (0,3)node{bi } -- (3,3)node {       a + bi} -- (3,0) node{a};
+
+
+    \end{tikzpicture}
+\end{itemize}
 
 \end{document}
