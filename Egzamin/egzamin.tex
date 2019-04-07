@@ -79,4 +79,73 @@ Zbiór liczb zespolonych oznaczamy $\mathds{C}$
     \end{tikzpicture}
 \end{itemize}
 
+\newpage
+
+\section{Bramki logiczne dla układów kwantowych}
+
+\subsection{Bramka Hadamarda (H)}
+$|0\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}$ \\
+$|1\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$
+\[H = \frac{1}{\sqrt{2}}
+\begin{bmatrix}
+    1 & 1 \\
+    1 & -1
+\end{bmatrix}
+=
+\begin{bmatrix}
+    \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+    \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+\]
+
+\subsection{Bramka Pauliego-X}
+Czasem nazywana "bit-flip" \\
+$|0\rangle = |1\rangle$ \\
+$|1\rangle = |0\rangle$
+\[X =
+\begin{bmatrix}
+    0 & 1 \\
+    1 & 0
+\end{bmatrix}
+\]
+
+\subsection{Bramka Pauliego-Y}
+$|0\rangle = i|1\rangle$ \\
+$|1\rangle = -i|0\rangle$
+\[Y =
+\begin{bmatrix}
+    0 & -i \\
+    i & 0
+\end{bmatrix}
+\]
+
+\subsection{Bramka Pauliego-Z}
+$|0\rangle = |0\rangle$ \\
+$|1\rangle = -|1\rangle$
+\[Z =
+\begin{bmatrix}
+    1 & 0 \\
+    0 & -1
+\end{bmatrix}
+\]
+
+\subsection{Bramka S}
+$|0\rangle = |0\rangle$ \\
+$|1\rangle = i|1\rangle$
+\[S =
+\begin{bmatrix}
+    1 & 0 \\
+    0 & i
+\end{bmatrix}
+\]
+
+\subsection{Bramka Fazy (T)}
+$|0\rangle = |0\rangle$ \\
+$|1\rangle = e^{i\frac{\pi}{4}}|1\rangle$
+\[T =
+\begin{bmatrix}
+    1 & 0 \\
+    0 & e^{i\frac{\pi}{4}}
+\end{bmatrix}
+\]
 \end{document}

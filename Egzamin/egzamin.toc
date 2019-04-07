@@ -1,3 +1,10 @@
 \contentsline {section}{\numberline {1}Liczby zespolone}{1}{section.1}
 \contentsline {subsection}{\numberline {1.1}Posta\IeC {\'c} Algebraiczna}{1}{subsection.1.1}
 \contentsline {subsection}{\numberline {1.2}Posta\IeC {\'c} trygonometryczna}{2}{subsection.1.2}
+\contentsline {section}{\numberline {2}Bramki logiczne dla uk\IeC {\l }ad\IeC {\'o}w kwantowych}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}Bramka Hadamarda (H)}{3}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Bramka Pauliego-X}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Bramka Pauliego-Y}{3}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Bramka Pauliego-Z}{3}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Bramka S}{3}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Bramka Fazy (T)}{3}{subsection.2.6}

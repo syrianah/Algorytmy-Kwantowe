@@ -35,4 +35,9 @@ import scipy.linalg
 # print(c*2)
 # # print(cmath.sqrt(np.vdot(a, c)))
 
-print(complex(0, -1) * complex(1, 0))
+v = np.array([2+3j, 0-2j, 5+0j, 0+1j])
+w = np.array([0-1j, -1+0j, 3-1j, -1-1j])
+
+print(np.vdot(w, v))
+
+# print(complex(0, -1) * complex(1, 0))
