@@ -2,7 +2,6 @@ import numpy as np
 from complex import Complex
 import cmath
 import math
-from qubit import Qubit
 
 class Vector:
 
@@ -42,12 +41,6 @@ class Vector:
     def __repr__(self):
         return str(self.values)
 
-def mul(M, V):
-    for i in range(len(V.values)):
-        alfa = M[0, 0] * V.values[i] + M[1, 0] * V.values[i+1]
-        beta = M[0, 1] * V.values[i] + M[1, 1] * V.values[i+1]
-    return Qubit(alfa, beta)
-
 
 a = Complex(1, 2)
 b = Complex(3, 4)
@@ -58,10 +51,6 @@ f = Complex(2, 3)
 al = 1/math.sqrt(2)
 vector1 = Vector([a, b, c])
 vector2 = Vector([d, e, f])
-
-H = np.array([[1, 1],[1, -1]])
-V = Vector([al, al])
-wynik = mul(H, V)
 
 # print(vector1)
 # print(vector1 + vector2)

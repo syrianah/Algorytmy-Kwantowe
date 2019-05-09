@@ -3,6 +3,7 @@ import math
 import random
 
 from complex import Complex, PolarToComplex
+from vector import Vector
 
 def P0(qubit):
     return abs(qubit.alpha)**2
@@ -25,6 +26,7 @@ def Measure(qubit):
             return 0
         else: return 1
     elif P0(qubit) < P1(qubit):
+        P = random.uniform(0, 1)
         if P < P1(qubit):
             return 1
         else: return 0
@@ -33,6 +35,10 @@ def Measure(qubit):
         if P < 0.5:
             return 0
         else: return 1
+
+def tensordot(a, b):
+    return np.kron(a.vector(), b.vector())
+    # return np.tensordot(a.vector(), b.vector(), axes=0)
 
 def randomQ():
     a = random.uniform(-1, 1)
@@ -51,6 +57,10 @@ def randomQ():
     d = (abs_beta**2 - c**2)**0.5
     beta = Complex(c, d)
     return Qubit(alpha, beta)
+
+def Identity():
+    return np.array([[Complex(1,0), Complex(0,0)],
+                    [Complex(0,0), Complex(1,0)]])
 
 def Hadamard():
     return np.array([[Complex(1/np.sqrt(2), 0), Complex(1/np.sqrt(2), 0)],
@@ -83,6 +93,19 @@ def TNgate():
     return np.array([[Complex(1, 0), Complex(0, 0)],
                     [Complex(0, 0), PolarToComplex(1, 45)]])
 
+def Cnot():
+    return np.array([[Complex(1, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
+                    [Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0)],
+                    [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0)],
+                    [Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0)]])
+
+def RCnot():
+    return np.array([[Complex(1, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
+                    [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0)],
+                    [Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0)],
+                    [Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0)]])
+    
+
 class Qubit:
     def __init__(self, alpha, beta):
         if 0.999999998 <= abs(alpha)**2 + abs(beta)**2 <= 1.00000001:
@@ -96,6 +119,8 @@ class Qubit:
         beta = gate[1, 0] * self.alpha + gate[1, 1] * self.beta
         return Qubit(alpha, beta)
 
+    def vector(self):
+        return [self.alpha, self.beta]
 
 m1 = np.array([[Complex(1, 0), Complex(0, 0)],
                 [Complex(0, 0), Complex(0, 0)]])
@@ -104,19 +129,20 @@ m2 = np.array([[Complex(0, 0), Complex(0, 0)],
                 [Complex(0, 0), Complex(1, 0)]])
 
 # print(0.4677056485736148 + 0.5322943514263851)
-a = Complex(1/np.sqrt(2), 0)
+# a = Complex(1/np.sqrt(2), 0)
 # a = Complex(a, 0)
 # # print(a**2+a**2)
 # # print(a)
-q = Qubit(a, a)
+# q = Qubit(a, a)
 # print(Measure(q))
-qM = Qubit_after_measure(q)
+# qM = Qubit_after_measure(q)
 # print(qM.alpha)
 # print(qM.beta)
 # # q1 = Qubit.randomQ()
 # q1 = randomQ()
-# print(q.alpha)
-# print(q.beta)
+
+# print(q1.alpha)
+# print(q1.beta)
 # print("-----------")
 # print(q1.alpha)
 # print(q1.beta)
@@ -131,19 +157,35 @@ SG = Sgate()
 TG = Tgate()
 SNG = SNgate()
 TNG = TNgate()
+CNOT = Cnot()
+RCNOT = RCnot()
+# print(RCNOT)
 
-new_qH = q * H
-# print(Measure(new_qH))
+#Odwrotny CNOT
+Hdot = np.kron(H, H)
+# print(Hdot)
+# print(CNOT)
 
-new_qX = new_qH * PX
-new_qY = new_qX * PY
-print(Measure(new_qY))
+HdotCnot = np.tensordot(CNOT, Hdot, axes=[0,1])
+# print(HdotCnot)
+
+ReverseCnot = np.tensordot(HdotCnot, Hdot, axes=[0,1])
+# print(ReverseCnot)
+
+# new_qX = q1 * PX
+# print(new_qX.alpha)
+# print(new_qX.beta)
+# print(Measure(new_qX))
+
+# new_qX = new_qH * PX
+# new_qY = new_qX * PY
+# print(Measure(new_qY))
 # print(new_qH.alpha)
 # print(new_qH.beta)
 # print(new_qX.alpha)
 # print(new_qX.beta)
-print(new_qY.alpha)
-print(new_qY.beta)
+# print(new_qY.alpha)
+# print(new_qY.beta)
 
 # Tg = q * PZ
 # print(Tg.alpha)
@@ -154,3 +196,26 @@ print(new_qY.beta)
 # print(TNrand.beta)
 
 # print(Complex(0, -1) * Complex(1, 0))
+
+# q1 = Qubit(Complex(0, 0), Complex(1, 0))
+# q2 = Qubit(Complex(1, 0), Complex(0, 0))
+
+# newq1 = q1 * H
+# newq2 = q2 * H
+
+# print(newq1.alpha, newq1.beta)
+
+# tensor = tensordot(newq2, newq1)
+# print(tensor)
+
+# Hdot = np.kron(H, H)
+
+# print(Hdot)
+# print(CNOT)
+# HdotCnot = np.tensordot(CNOT, Hdot, axes=[0,1])
+# print(HdotCnot)
+
+# ReverseCnot = np.tensordot(HdotCnot, Hdot, axes=[0,1])
+
+# print(ReverseCnot)
+

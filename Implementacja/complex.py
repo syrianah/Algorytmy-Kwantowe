@@ -66,7 +66,7 @@ class Complex:
         r = pow(abs(self), n)
         phi = n*self.angle()
         return Complex(math.cos(phi)*r, math.sin(phi)*r)
-
+    
 
 # num1 = Complex(1, 2)
 # num2 = Complex(2, 2)
