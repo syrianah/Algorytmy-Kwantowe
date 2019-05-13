@@ -23,4 +23,4 @@ psi = Qubit(Complex(0,0), Complex(1,0))
 # print(psi.alpha, psi.beta)
 
 #Pierwszy Krok
-# first = np.kron(CNOT, x)
+# first = np.kron()
