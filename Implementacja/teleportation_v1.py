@@ -22,6 +22,7 @@ print("splątany = ", xy)
 #Qubit do teleportowania
 psi = randomQ()
 # psi = Qubit(Complex(0, 0), Complex(1, 0))
+print("Qubit po stronie Alicji")
 print("psi = ", psi.alpha, psi.beta)
 
 #Pierwszy Krok
@@ -76,4 +77,5 @@ beta = P[3] * 2
 #Qubit po teleportacji
 psi = Qubit(alpha, beta)
 psi = psi * X
+print("Qubit po stronie Boba")
 print("psi = ", psi.alpha, psi.beta)
