@@ -1,43 +1,21 @@
+from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot
+from complex import Complex
 import numpy as np
-import cmath
-import numpy as np
-import scipy as sp
-import scipy.linalg
+import math
 
-# Zero = np.array([[1.0],
-#                  [0.0]])
-# One = np.array([[0.0],
-#                 [1.0]])
-#
-# NormalizeState = lambda state: state / sp.linalg.norm(state)
-#
-# Plus = NormalizeState(Zero + One)
-#
-# Hadamard = 1./np.sqrt(2) * np.array([[1, 1],
-#                                      [1, -1]])
-#
-# NewState = np.dot(Hadamard, Zero)
-# print(NewState)
+Cnot = Cnot()
+I = Identity()
 
-# a = np.array([1+2j,3+4j, 5+6j])
-# c = np.array([0+1j,1+0j, 2+3j])
-# b = np.vdot(a, a)
-# d = np.vdot(c, c)
-# print(cmath.sqrt(b))
-# print(cmath.sqrt(d))
-# print(cmath.sqrt(1+2j))
-# print(np.vdot(a, c))
-# print(a)
-# print(a + c)
-# print(a - c)
-# print(np.vdot(a, c))
-# print(a*2)
-# print(c*2)
-# # print(cmath.sqrt(np.vdot(a, c)))
+q1 = Qubit(Complex(0, 0), Complex(1, 0))
+q2 = Qubit(Complex(0, 0), Complex(1, 0))
+q3 = Qubit(Complex(0, 0), Complex(1, 0))
 
-v = np.array([2+3j, 0-2j, 5+0j, 0+1j])
-w = np.array([0-1j, -1+0j, 3-1j, -1-1j])
+Q = tensordot(q1, q2)
+Q = np.kron(Q, q3.vector())
+print(Q)
 
-print(np.vdot(w, v))
+Cnot = np.kron(Cnot, I)
+print(Cnot)
 
-# print(complex(0, -1) * complex(1, 0))
+Q = np.tensordot(Cnot, Q, axes=[1,0])
+print(Q)

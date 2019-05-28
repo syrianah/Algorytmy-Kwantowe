@@ -1,9 +1,10 @@
-from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ
+from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ, PauliX
 from complex import Complex
 import numpy as np
 import math
 
 #Inicjalizacja Bramek
+X = PauliX()
 H = Hadamard()
 CNOT = Cnot()
 RCNOT = RCnot()
@@ -24,11 +25,13 @@ psi = randomQ()
 print("psi = ", psi.alpha, psi.beta)
 
 #Pierwszy Krok
+# first = np.kron(xy, psi.vector())
 first = np.kron(psi.vector(), xy)
 print("pierwszy = ", first)
 
 #Drugi Krok
 Cnot = np.kron(CNOT, I)
+# print(Cnot)
 second = np.tensordot(Cnot, first, axes=[1,0])
 print("drugi = ", second)
 
@@ -49,13 +52,28 @@ M = np.array([[Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Compl
             [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0)],
             [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)]])
 
-# P = np.tensordot(third, third, axes=[1,0])
-# print(P)
-P = np.dot(third, third)
-# print(P)
+M0 = np.array([[Complex(1, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(0, 0)]])
 
-# P = (1 - abs(P)**2)/2
-# print("wynik", P)
+M1 = np.array([[Complex(0, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(1, 0)]])
 
-# q1 = Qubit(third[0], third[1])
-# print(q1.alpha, q1.beta)
+
+M01 = np.kron(M0, M1)
+M010 = np.kron(M01, I)
+# print(M010)
+
+P = np.tensordot(M010, third, axes=[1,0])
+print(P)
+
+# for i in range(len(P)):
+#     print(P[i])
+
+alpha = P[2] * 2
+beta = P[3] * 2
+# print(alpha, beta)
+
+#Qubit po teleportacji
+psi = Qubit(alpha, beta)
+psi = psi * X
+print("psi = ", psi.alpha, psi.beta)
