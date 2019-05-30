@@ -44,15 +44,6 @@ third = np.tensordot(H, second, axes=[1,0])
 print("trzeci = ", third)
 
 #Pomiar
-M = np.array([[Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)]])
-
 M0 = np.array([[Complex(1, 0), Complex(0, 0)],
             [Complex(0, 0), Complex(0, 0)]])
 
@@ -67,9 +58,7 @@ M010 = np.kron(M01, I)
 P = np.tensordot(M010, third, axes=[1,0])
 print(P)
 
-# for i in range(len(P)):
-#     print(P[i])
-
+#Przypisanie
 alpha = P[2] * 2
 beta = P[3] * 2
 # print(alpha, beta)
