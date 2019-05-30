@@ -18,8 +18,28 @@ xy = tensordot(x, y)
 xy = np.tensordot(CNOT, xy, axes=[1,0])
 print("splątany = ", xy)
 
-X = np.tensordot(X, I, axes=[1,0])
-first = np.kron(X, xy)
+#Pierwszy krok
+X = np.kron(X, I)
+first = np.tensordot(X, xy, axes=[1,0])
 print(first)
 
+#Drugi krok
 second = np.tensordot(CNOT, first, axes=[1,0])
+print(second)
+
+#Trzeci krok
+H = np.kron(H, I)
+third = np.tensordot(H, second, axes=[1,0])
+print(third)
+
+#Pomiar
+M0 = np.array([[Complex(1, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(0, 0)]])
+
+M1 = np.array([[Complex(0, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(1, 0)]])
+
+
+M00 = np.kron(M0, M1)
+P = np.tensordot(M00, third, axes=[1,0])
+print(P)
