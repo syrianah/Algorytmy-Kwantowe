@@ -1,10 +1,12 @@
-from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ, PauliX
+from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ, PauliX, PauliY, PauliZ
 from complex import Complex
 import numpy as np
 import math
 
 #Inicjalizacja Bramek
 X = PauliX()
+Y = PauliY()
+Z = PauliZ()
 H = Hadamard()
 CNOT = Cnot()
 I = Identity()
@@ -40,6 +42,6 @@ M1 = np.array([[Complex(0, 0), Complex(0, 0)],
             [Complex(0, 0), Complex(1, 0)]])
 
 
-M00 = np.kron(M0, M1)
-P = np.tensordot(M00, third, axes=[1,0])
+M10 = np.kron(M1, M1)
+P = np.tensordot(M10, third, axes=[1,0])
 print(P)
