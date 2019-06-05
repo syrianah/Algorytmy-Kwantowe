@@ -61,7 +61,7 @@ elif opcja == '01':
     P = np.tensordot(M01, third, axes=[1,0])
 elif opcja == '10':
     M10 = np.kron(M1, M0)
-    P = np.tensordot(M01, third, axes=[1,0])
+    P = np.tensordot(M10, third, axes=[1,0])
 elif opcja == '11':
     M11 = np.kron(M1, M1)
     P = np.tensordot(M11, third, axes=[1,0])
