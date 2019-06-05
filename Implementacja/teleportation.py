@@ -1,7 +1,11 @@
-from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ, PauliX
+from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, randomQ, PauliX, M0, M1
 from complex import Complex
 import numpy as np
 import math
+
+#Inicjalizacja macierzy pomiaru
+M0 = M0()
+M1 = M1()
 
 #Inicjalizacja Bramek
 X = PauliX()
@@ -44,13 +48,6 @@ third = np.tensordot(H, second, axes=[1,0])
 print("trzeci = ", third)
 
 #Pomiar
-M0 = np.array([[Complex(1, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(0, 0)]])
-
-M1 = np.array([[Complex(0, 0), Complex(0, 0)],
-            [Complex(0, 0), Complex(1, 0)]])
-
-
 M01 = np.kron(M0, M1)
 M010 = np.kron(M01, I)
 # print(M010)
