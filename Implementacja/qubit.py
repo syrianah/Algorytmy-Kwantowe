@@ -58,6 +58,15 @@ def randomQ():
     beta = Complex(c, d)
     return Qubit(alpha, beta)
 
+def M0():
+    return np.array([[Complex(1, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(0, 0)]])
+
+def M1():
+    return np.array([[Complex(0, 0), Complex(0, 0)],
+            [Complex(0, 0), Complex(1, 0)]])
+
+
 def Identity():
     return np.array([[Complex(1,0), Complex(0,0)],
                     [Complex(0,0), Complex(1,0)]])
