@@ -1,151 +1,193 @@
-\documentclass[12pt]{article}
-\usepackage{polski}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{graphicx}
-\usepackage{grffile}
-\usepackage{longtable}
-\usepackage{hyperref}
-\usepackage{wrapfig}
-\usepackage{rotating}
-\usepackage[normalem]{ulem}
+% \documentclass[draft]{beamer}
+% \usepackage[size=custom,height=10,width=13,scale=0.7]{beamerposter}
+% \usepackage[braket, qm]{qcircuit}
+% \usepackage{polski}
+% \usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
+% \usepackage{graphicx}
+% \usepackage{grffile}
+% \usepackage{longtable}
+% \usepackage{hyperref}
+% \usepackage{wrapfig}
+% \usepackage{rotating}
+% \usepackage[normalem]{ulem}
+% \usepackage{amsmath}
+% \usepackage{textcomp}
+% \usepackage{amssymb}
+% \usepackage{capt-of}
+% \usepackage{amsmath}
+% \usepackage{mathtools}
+% \usepackage{geometry}
+% \usepackage{tikz}
+% \usepackage{ dsfont }
+% \pdfmapfile{+sansmathaccent.map}
+
+
+%  \geometry{
+%  a4paper,
+%  total={170mm,257mm},
+%  left=20mm,
+%  top=20mm,
+%  }
+
+%  \hypersetup{
+%     colorlinks=true,
+%     linkcolor=blue,
+%     filecolor=magenta,
+%     urlcolor=cyan,
+% }
+
+% \title{\textbf{Algorytmów Kwantowych}}
+% \author{Wojciech Kubiak}
+% \date{\today}
+
+% \begin{document}
+
+% \maketitle
+
+% \tableofcontents
+
+% \section{Liczby zespolone}
+% Zbiór liczb zespolonych oznaczamy $\mathds{C}$
+
+% \subsection{Postać Algebraiczna}
+% \begin{itemize}
+%     \item \textbf{Podstawowe informacje:}
+%     \begin{center}
+%         $\alpha = a + bi$ , \quad a, b $\in \mathds{R}$ , \quad i $= \sqrt{-1}$ \\
+%         Re$(\alpha) =$ a \quad - część rzeczywist \\
+%         Im$(\alpha) =$ b \quad - część urojona
+%     \end{center}
+%     \item \textbf{Operacje $\pmb(\mathds{C}, +, -, *, /)$:}
+%     \begin{center}
+%         $\alpha = a + bi$ \quad $\beta = c + di$
+%     \end{center}
+%     \begin{itemize}
+%         \item $(+)$ $\alpha + \beta = (a + bi) + (c + di) = (a + c) + (b + d)i$
+%         \item $(-)$ $\alpha - \beta = (a + bi) - (c + di) = (a - c) + (b - d)i$
+%         \item $(*)$ $\alpha * \beta = (a + bi) * (c + di) = ac + adi + cbi + bdi^2 = ac + adi + abi - bd = (ac - bd) + (ad + cb)i$
+%         \item $(/)$ $\frac{\alpha}{\beta} = \frac{(a+bi)(c-di)}{(c+di)(c-di)} = \frac{ac - adi + abi + bd}{c^2 + b^2} = (\frac{ac + bd}{c^2 + b^2}) + (\frac{bc - ad}{c^2 + b^2})i$
+%     \end{itemize}
+% \end{itemize}
+
+% \subsection{Postać trygonometryczna}
+% \begin{itemize}
+%     \item \textbf{Podstawowe informacje:}
+%     \begin{tikzpicture}
+%         \draw[thick,->] (0,0) -- (4.5,0) node[anchor=north west] {Re};
+%         \draw[thick,->] (0,0) -- (0,4.5) node[anchor=south east] {Im};
+%         \draw [dashed] (0,3)node{bi } -- (3,3)node {       a + bi} -- (3,0) node{a};
+
+
+%     \end{tikzpicture}
+% \end{itemize}
+
+% \newpage
+
+% \section{Bramki logiczne dla układów kwantowych}
+
+% \subsection{Bramka Hadamarda (H)}
+% $|0\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}$ \\
+% $|1\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$
+% \[H = \frac{1}{\sqrt{2}}
+% \begin{bmatrix}
+%     1 & 1 \\
+%     1 & -1
+% \end{bmatrix}
+% =
+% \begin{bmatrix}
+%     \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+%     \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+% \end{bmatrix}
+% \]
+
+% \subsection{Bramka Pauliego-X}
+% Czasem nazywana "bit-flip" \\
+% $|0\rangle = |1\rangle$ \\
+% $|1\rangle = |0\rangle$
+% \[X =
+% \begin{bmatrix}
+%     0 & 1 \\
+%     1 & 0
+% \end{bmatrix}
+% \]
+
+% \subsection{Bramka Pauliego-Y}
+% $|0\rangle = i|1\rangle$ \\
+% $|1\rangle = -i|0\rangle$
+% \[Y =
+% \begin{bmatrix}
+%     0 & -i \\
+%     i & 0
+% \end{bmatrix}
+% \]
+
+% \subsection{Bramka Pauliego-Z}
+% $|0\rangle = |0\rangle$ \\
+% $|1\rangle = -|1\rangle$
+% \[Z =
+% \begin{bmatrix}
+%     1 & 0 \\
+%     0 & -1
+% \end{bmatrix}
+% \]
+
+% \subsection{Bramka S}
+% $|0\rangle = |0\rangle$ \\
+% $|1\rangle = i|1\rangle$
+% \[S =
+% \begin{bmatrix}
+%     1 & 0 \\
+%     0 & i
+% \end{bmatrix}
+% \]
+
+% \subsection{Bramka Fazy (T)}
+% $|0\rangle = |0\rangle$ \\
+% $|1\rangle = e^{i\frac{\pi}{4}}|1\rangle$
+% \[T =
+% \begin{bmatrix}
+%     1 & 0 \\
+%     0 & e^{i\frac{\pi}{4}}
+% \end{bmatrix}
+% \]
+
+% \begin{equation*}
+%     \Qcircuit @C=0.5em @R=0.0em @!R {
+%                 \lstick{q0_{0}: \ket{0}} & \gate{H} & \qw & \ctrl{1} & \meter & \qw & \qw & \qw\\
+%                 \lstick{q0_{1}: \ket{0}} & \gate{X} & \gate{H} & \targ & \qw & \meter & \qw & \qw\\
+%                 \lstick{q0_{2}: \ket{0}} & \gate{H} & \meter & \qw & \qw & \qw & \qw & \qw\\
+%                 \lstick{c0_{0}: 0} & \cw & \cw & \cw & \cw \cwx[-3] & \cw & \cw & \cw\\
+%                 \lstick{c0_{1}: 0} & \cw & \cw & \cw & \cw & \cw \cwx[-3] & \cw & \cw\\
+%                 \lstick{c0_{2}: 0} & \cw & \cw \cwx[-3] & \cw & \cw & \cw & \cw & \cw\\
+%          }
+% \end{equation*}
+% \end{document}
+
+% \documentclass[preview]{standalone}
+% If the image is too large to fit on this documentclass use
+\documentclass[draft]{beamer}
+% img_width = 6, img_depth = 7
+\usepackage[size=custom,height=10,width=13,scale=0.7]{beamerposter}
+% instead and customize the height and width (in cm) to fit.
+% Large images may run out of memory quickly.
+% To fix this use the LuaLaTeX compiler, which dynamically
+% allocates memory.
+\usepackage[braket, qm]{qcircuit}
 \usepackage{amsmath}
-\usepackage{textcomp}
-\usepackage{amssymb}
-\usepackage{capt-of}
-\usepackage{amsmath}
-\usepackage{mathtools}
-\usepackage{geometry}
-\usepackage{tikz}
-\usepackage{ dsfont }
-
-
- \geometry{
- a4paper,
- total={170mm,257mm},
- left=20mm,
- top=20mm,
- }
-
- \hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=cyan,
-}
-
-\title{\textbf{Algorytmów Kwantowych}}
-\author{Wojciech Kubiak}
-\date{\today}
-
+\pdfmapfile{+sansmathaccent.map}
+% \usepackage[landscape]{geometry}
+% Comment out the above line if using the beamer documentclass.
 \begin{document}
+\begin{equation*}
+    \Qcircuit @C=0.5em @R=0.0em @!R {
+                \lstick{q0_{0}: \ket{0}} & \gate{H} & \qw & \ctrl{1} & \meter & \qw & \qw & \qw\\
+                \lstick{q0_{1}: \ket{0}} & \gate{X} & \gate{H} & \targ & \qw & \meter & \qw & \qw\\
+                \lstick{q0_{2}: \ket{0}} & \gate{H} & \meter & \qw & \qw & \qw & \qw & \qw\\
+                \lstick{c0_{0}: 0} & \cw & \cw & \cw & \cw \cwx[-3] & \cw & \cw & \cw\\
+                \lstick{c0_{1}: 0} & \cw & \cw & \cw & \cw & \cw \cwx[-3] & \cw & \cw\\
+                \lstick{c0_{2}: 0} & \cw & \cw \cwx[-3] & \cw & \cw & \cw & \cw & \cw\\
+         }
+\end{equation*}
 
-\maketitle
-
-\tableofcontents
-
-\section{Liczby zespolone}
-Zbiór liczb zespolonych oznaczamy $\mathds{C}$
-
-\subsection{Postać Algebraiczna}
-\begin{itemize}
-    \item \textbf{Podstawowe informacje:}
-    \begin{center}
-        $\alpha = a + bi$ , \quad a, b $\in \mathds{R}$ , \quad i $= \sqrt{-1}$ \\
-        Re$(\alpha) =$ a \quad - część rzeczywist \\
-        Im$(\alpha) =$ b \quad - część urojona
-    \end{center}
-    \item \textbf{Operacje $\pmb(\mathds{C}, +, -, *, /)$:}
-    \begin{center}
-        $\alpha = a + bi$ \quad $\beta = c + di$
-    \end{center}
-    \begin{itemize}
-        \item $(+)$ $\alpha + \beta = (a + bi) + (c + di) = (a + c) + (b + d)i$
-        \item $(-)$ $\alpha - \beta = (a + bi) - (c + di) = (a - c) + (b - d)i$
-        \item $(*)$ $\alpha * \beta = (a + bi) * (c + di) = ac + adi + cbi + bdi^2 = ac + adi + abi - bd = (ac - bd) + (ad + cb)i$
-        \item $(/)$ $\frac{\alpha}{\beta} = \frac{(a+bi)(c-di)}{(c+di)(c-di)} = \frac{ac - adi + abi + bd}{c^2 + b^2} = (\frac{ac + bd}{c^2 + b^2}) + (\frac{bc - ad}{c^2 + b^2})i$
-    \end{itemize}
-\end{itemize}
-
-\subsection{Postać trygonometryczna}
-\begin{itemize}
-    \item \textbf{Podstawowe informacje:}
-    \begin{tikzpicture}
-        \draw[thick,->] (0,0) -- (4.5,0) node[anchor=north west] {Re};
-        \draw[thick,->] (0,0) -- (0,4.5) node[anchor=south east] {Im};
-        \draw [dashed] (0,3)node{bi } -- (3,3)node {       a + bi} -- (3,0) node{a};
-
-
-    \end{tikzpicture}
-\end{itemize}
-
-\newpage
-
-\section{Bramki logiczne dla układów kwantowych}
-
-\subsection{Bramka Hadamarda (H)}
-$|0\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}$ \\
-$|1\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$
-\[H = \frac{1}{\sqrt{2}}
-\begin{bmatrix}
-    1 & 1 \\
-    1 & -1
-\end{bmatrix}
-=
-\begin{bmatrix}
-    \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
-    \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
-\end{bmatrix}
-\]
-
-\subsection{Bramka Pauliego-X}
-Czasem nazywana "bit-flip" \\
-$|0\rangle = |1\rangle$ \\
-$|1\rangle = |0\rangle$
-\[X =
-\begin{bmatrix}
-    0 & 1 \\
-    1 & 0
-\end{bmatrix}
-\]
-
-\subsection{Bramka Pauliego-Y}
-$|0\rangle = i|1\rangle$ \\
-$|1\rangle = -i|0\rangle$
-\[Y =
-\begin{bmatrix}
-    0 & -i \\
-    i & 0
-\end{bmatrix}
-\]
-
-\subsection{Bramka Pauliego-Z}
-$|0\rangle = |0\rangle$ \\
-$|1\rangle = -|1\rangle$
-\[Z =
-\begin{bmatrix}
-    1 & 0 \\
-    0 & -1
-\end{bmatrix}
-\]
-
-\subsection{Bramka S}
-$|0\rangle = |0\rangle$ \\
-$|1\rangle = i|1\rangle$
-\[S =
-\begin{bmatrix}
-    1 & 0 \\
-    0 & i
-\end{bmatrix}
-\]
-
-\subsection{Bramka Fazy (T)}
-$|0\rangle = |0\rangle$ \\
-$|1\rangle = e^{i\frac{\pi}{4}}|1\rangle$
-\[T =
-\begin{bmatrix}
-    1 & 0 \\
-    0 & e^{i\frac{\pi}{4}}
-\end{bmatrix}
-\]
 \end{document}
