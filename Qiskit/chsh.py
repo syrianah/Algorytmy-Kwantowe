@@ -17,7 +17,7 @@ def qAlice_output(strategy, inp):
         if(inp == 0):
             return 0
         elif(inp == 1):
-            return np.pi/2
+            return np.pi/4
 
     else:
         print("INVALID choice")
@@ -33,9 +33,9 @@ def qBob_output(strategy, inp):
 
     elif(strategy == 3):
         if(inp == 0):
-            return np.pi/4
+            return np.pi/8
         elif(inp == 1):
-            return -np.pi/4
+            return -np.pi/8
 
     else:
         print("INVALID choice")
@@ -43,12 +43,15 @@ def qBob_output(strategy, inp):
 
 
 # Alice's strategy
-qA_st = int(input(
-    'select the quantum strategy for Alice, input 1,2 or 3 to pick one of the strategies listed above: '))
+# qA_st = int(input(
+#     'select the quantum strategy for Alice, input 1,2 or 3 to pick one of the strategies listed above: '))
 
-# Bob's strategy
-qB_st = int(input(
-    'select the quantum strategy for Bob, input 1,2 or 3 to pick one of the strategies listed above: '))
+# # Bob's strategy
+# qB_st = int(input(
+#     'select the quantum strategy for Bob, input 1,2 or 3 to pick one of the strategies listed above: '))
+
+qA_st = 3
+qB_st = 3
 
 # set parameters of the quantum run of the game
 shots = 1  # set how many times the circuit is run, accumulating statistics about the measurement outcomes
@@ -80,18 +83,8 @@ for i in range(N):
     game.cx(q[0], q[1])  # CNOT gate on qubit 1 controlled by qubit 0
 
     # generates two random input from the refree, x and y, to be given to Alice and Bob
-    random_num1 = rand.random()  # first random number
-    random_num2 = rand.random()  # second random number
-
-    if(random_num1 >= 1/2):  # converts the first random number to 0 or 1
-        x = 0
-    else:
-        x = 1
-
-    if(random_num2 >= 1/2):  # converts the second random number to 0 or 1
-        y = 0
-    else:
-        y = 1
+    x = rand.randint(0, 1)  # first random number
+    y = rand.randint(0, 1)  # second random number
 
     # The main part of Alice and Bob quantum strategy is to fix different rotation angles for their qubit according to the input x,y
     theta = qAlice_output(qA_st, x)  # fixes Alice's rotation for her qubit
