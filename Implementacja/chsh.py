@@ -83,6 +83,7 @@ RYGATE = np.kron(RY(theta), RY(phi))
 
 # second = np.tensordot(RYGATE, first, axes=[1, 0])
 second = np.matmul(first, RYGATE)
+print("second =", second)
 M01 = np.kron(M0, M1)
 P = np.matmul(M01, second)
 print(P)
