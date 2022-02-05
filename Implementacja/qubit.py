@@ -125,10 +125,8 @@ def TNgate():
 
 def Cnot():
     return np.array([[Complex(1, 0), Complex(0, 0), Complex(0, 0), Complex(0, 0)],
-                     [Complex(0, 0), Complex(1, 0),
-                      Complex(0, 0), Complex(0, 0)],
-                     [Complex(0, 0), Complex(0, 0),
-                      Complex(0, 0), Complex(1, 0)],
+                     [Complex(0, 0), Complex(1, 0), Complex(0, 0), Complex(0, 0)],
+                     [Complex(0, 0), Complex(0, 0), Complex(0, 0), Complex(1, 0)],
                      [Complex(0, 0), Complex(0, 0), Complex(1, 0), Complex(0, 0)]])
 
 
@@ -200,6 +198,9 @@ class Qubit:
         alpha = gate[0, 0] * self.alpha + gate[0, 1] * self.beta
         beta = gate[1, 0] * self.alpha + gate[1, 1] * self.beta
         return Qubit(alpha, beta)
+    
+    def __str__(self) -> str:
+        return f"|Ψ> = {self.alpha}|0> + {self.beta}|1>"
 
     def vector(self):
         return [self.alpha, self.beta]

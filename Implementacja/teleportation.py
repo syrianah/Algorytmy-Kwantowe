@@ -2,6 +2,7 @@ from qubit import Qubit, tensordot, Hadamard, Cnot, Measure, Identity, RCnot, ra
 from complex import Complex
 import numpy as np
 import math
+import time
 
 #Inicjalizacja macierzy pomiaru
 M0 = M0()
@@ -14,12 +15,16 @@ CNOT = Cnot()
 RCNOT = RCnot()
 I = Identity()
 
+start = time.time()
+
 #Splątany Qubity Alicji i Boba
 x = Qubit(Complex(1, 0), Complex(0, 0))
 y = Qubit(Complex(1, 0), Complex(0, 0))
 
 x = x * H
+print("x", x)
 xy = tensordot(x, y)
+print("xy", xy)
 xy = np.tensordot(CNOT, xy, axes=[1,0])
 print("splątany = ", xy)
 
@@ -65,3 +70,5 @@ psi = Qubit(alpha, beta)
 psi = psi * X
 print("Qubit po stronie Boba")
 print("psi = ", psi.alpha, psi.beta)
+end = time.time()
+print("Ukończono w czasie:", (end - start) * 1000)
