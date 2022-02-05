@@ -21,7 +21,7 @@ impl Qubit {
     // Qubit constructor - check is it qubit
     pub fn new(a: &Complex<f64>, b: &Complex<f64>) -> Qubit {
         let check = f64::powf(a.norm_sqr(), 2.0) + f64::powf(b.norm_sqr(), 2.0);
-        println!("Check: {}", check);
+        // println!("Check: {}", check);
         if 0.999999998 <= check || check <= 1.00000001{
             Qubit {
                 alfa: *a,
@@ -60,9 +60,7 @@ impl Qubit {
         return format!("|Ψ> = {}|0> + {}|1>", self.alfa, self.beta)
     }
 
-    // pub fn to_vector(&self) ->  ArrayBase<OwnedRepr<Complex<f64>>, Dim<[usize; 1]>> {
-    //     return array![self.alfa, self.beta];
-    // }
+    // Get qubit in vector representation
     pub fn to_vector(&self) ->  Array<Complex<f64>, Dim<[usize; 1]>> {
         return array![self.alfa, self.beta];
     }
@@ -100,7 +98,20 @@ impl Qubit {
 }
 
 pub fn kron1d(a: &Array<Complex<f64>, Dim<[usize; 1]>>, b: &Array<Complex<f64>, Dim<[usize; 1]>>) -> Array<Complex<f64>, Dim<[usize; 1]>> {
-    return array![a[0]*b[0], a[0]*b[1], a[1]*b[0], a[1]*b[1]]
+    let dimout = a.len() * b.len();
+    // println!("dimout = {}", dimout);
+    let mut out = Array::zeros(dimout);
+    // println!("out1 = {}", out);
+    let mut id = 0;
+    for i in 0..=a.len()-1{
+        for j in 0..=b.len()-1{
+            // println!("i = {}, j = {}", i, j);
+             out[id] = a[i] * b[j];
+             id+=1;
+        }   
+    }
+    return out;
+    // return array![a[0]*b[0], a[0]*b[1], a[1]*b[0], a[1]*b[1]]
 }
 
 pub fn kron(a: &Array2<Complex<f64>>, b: &Array2<Complex<f64>>) -> Array2<Complex<f64>> {
