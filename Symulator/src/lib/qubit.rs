@@ -1,15 +1,9 @@
-// use std::f64::consts::PI;
 // #[macro_use]
 extern crate ndarray;
-// extern crate rand;
 
 use ndarray::prelude::*;
 use num::complex::Complex;
 use std::ops::Mul;
-use ndarray::arr2;
-use ndarray::Array2;
-use ndarray::ArrayBase;
-use ndarray::OwnedRepr;
 use rand::Rng;
 
 pub struct Qubit {
@@ -29,7 +23,6 @@ impl Qubit {
             }
         }
         else {
-            // maybe add error handle?
             panic!("Cannot create qubit");
         }
 
@@ -65,13 +58,6 @@ impl Qubit {
         return array![self.alfa, self.beta];
     }
 
-    // Get qubit operation with 2d gate
-    pub fn mul(self: Qubit, gate: Array2<Complex<f64>>) -> Qubit{
-        let a = gate[[0, 0]] * self.alfa + gate[[0, 1]] * self.beta;
-        let b = gate[[1, 0]] * self.alfa + gate[[1, 1]] * self.beta;
-        return Qubit::new(&a, &b);
-    }
-
     // Get random qubit, not working every time (same as in python xd)
     pub fn random() -> Qubit {
         let mut rng = rand::thread_rng();
@@ -97,49 +83,27 @@ impl Qubit {
 
 }
 
+ // Get qubit operation with 2d gate
+impl Mul<Array2<Complex<f64>>> for Qubit {
+    type Output = Self;
+
+    fn mul(self, gate: Array2<Complex<f64>>) -> Self::Output  {
+        let a = gate[[0, 0]] * self.alfa + gate[[0, 1]] * self.beta;
+        let b = gate[[1, 0]] * self.alfa + gate[[1, 1]] * self.beta;
+        return Qubit::new(&a, &b);
+    }
+}
+
+// Iloczyn tensorowy Kronecera dwóch wektorów
 pub fn kron1d(a: &Array<Complex<f64>, Dim<[usize; 1]>>, b: &Array<Complex<f64>, Dim<[usize; 1]>>) -> Array<Complex<f64>, Dim<[usize; 1]>> {
     let dimout = a.len() * b.len();
-    // println!("dimout = {}", dimout);
     let mut out = Array::zeros(dimout);
-    // println!("out1 = {}", out);
     let mut id = 0;
     for i in 0..=a.len()-1{
         for j in 0..=b.len()-1{
-            // println!("i = {}, j = {}", i, j);
              out[id] = a[i] * b[j];
              id+=1;
         }   
     }
     return out;
-    // return array![a[0]*b[0], a[0]*b[1], a[1]*b[0], a[1]*b[1]]
 }
-
-pub fn kron(a: &Array2<Complex<f64>>, b: &Array2<Complex<f64>>) -> Array2<Complex<f64>> {
-    let dima = a.shape()[0];
-    let dimb = b.shape()[0];
-    let dimout = dima * dimb;
-    let mut out = Array2::zeros((dimout, dimout));
-    for (mut chunk, elem) in out.exact_chunks_mut((dimb, dimb)).into_iter().zip(a.iter()) {
-        chunk.assign(&(*elem * b));
-    }
-    out
-}
-
-// pub fn mulGate(qubit: Qubit, gate: [[Complex<f64>; 2]; 2]){
-//     let alpha = gate[0][0] * qubit.alfa() + gate[0][1] * qubit.beta();
-//     let beta = gate[0][0] * qubit.alfa() + gate[1][1] * qubit.beta();
-//     Qubit::new(&alpha, &beta);
-// }
-
-//TODO
-// change to vector!
-
-// impl Mul for Qubit {
-//     type Output = Self;
-
-//     fn mul(self: Qubit, gate: [[Complex<f64>; 2]; 2]){
-//         let alpha = gate[0][0] * self.alfa + gate[0][1] * self.beta;
-//         let beta = gate[0][0] * self.alfa + gate[1][1] * self.beta;
-//         Qubit::new(&alpha, &beta);
-//     }
-// }
