@@ -15,7 +15,6 @@ impl Qubit {
     // Qubit constructor - check is it qubit
     pub fn new(a: &Complex<f64>, b: &Complex<f64>) -> Qubit {
         let check = f64::powf(a.norm_sqr(), 2.0) + f64::powf(b.norm_sqr(), 2.0);
-        // println!("Check: {}", check);
         if 0.999999998 <= check || check <= 1.00000001{
             Qubit {
                 alfa: *a,
