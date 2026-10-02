@@ -487,6 +487,13 @@ syntax experiment <name:id> <body:block> => fn ${name}() -> i64 {
     return 0
 }
 
+// Wariant z parametrami: `experiment nazwa(n:i64) { ... }`.
+syntax extend experiment <name:id> "(" <params:raw> ")" <body:block> => fn ${name}(${params}) -> i64 {
+    var cname:u8* = "${name}"
+    if 1 == 1 ${body}
+    return 0
+}
+
 syntax qubit <name:id> => var ${name} = Quantum:alloc(qs, "${name}")
 
 syntax seed <value:expr> => quantum_seed(${value})

@@ -52,6 +52,7 @@ recurloop --file przyklady/teleportacja.rl
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
 | `uruchom.sh` | Uruchamia testy i przykłady |
+| `benchmark/` | Ten sam symulator w Pythonie, NumPy i Rust oraz porównanie wydajności |
 
 ## Język obwodów
 
@@ -62,6 +63,7 @@ recurloop --file przyklady/teleportacja.rl
 | `circuit nazwa { ... }` | Obwód jako funkcja natywna `nazwa() -> i64` z własnym rejestrem |
 | `circuit nazwa(a:i64, kat:f64) { ... }` | Obwód z parametrami |
 | `experiment nazwa { ... }` | Funkcja natywna bez rejestru, na przykład do statystyk |
+| `experiment nazwa(n:i64) { ... }` | To samo z parametrami |
 | `qubit nazwa` | Nowy kubit w stanie \|0> |
 | `seed 42` | Stałe ziarno losowości, domyślnie ziarno z zegara |
 
