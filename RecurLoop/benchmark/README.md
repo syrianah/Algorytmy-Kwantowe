@@ -5,20 +5,23 @@ implementacje dają identyczne sumy kontrolne, więc liczą dokładnie to samo.
 
 ## Wyniki
 
-Najlepszy z trzech czasów obliczeń w milisekundach, mierzony wewnątrz programu.
-Mniej znaczy lepiej.
+Czas obliczeń w milisekundach (ms). 1000 ms to 1 sekunda. Mniej znaczy
+szybciej. Każdy test uruchomiono trzy razy i wpisano najlepszy czas.
 
-| Implementacja | Teleportacja ×100 000 | Warstwy, 16 kubitów | Warstwy, 20 kubitów |
+| Implementacja | Teleportacja | 16 kubitów | 20 kubitów |
 |---|---:|---:|---:|
-| Python, czysty | 2 392 | 2 386 | 64 649 |
-| Python, NumPy | 22 118 | 184 | 1 633 |
-| Rust, dzielenie i modulo | 65 | 40 | 904 |
-| Rust, operatory bitowe | 57 | 23 | 500 |
-| **RecurLoop** | **77** | **51** | **1 115** |
+| Python, czysty | 2 392 ms | 2 386 ms | 64 649 ms |
+| Python, NumPy | 22 118 ms | 184 ms | 1 633 ms |
+| Rust, dzielenie i modulo | 65 ms | 40 ms | 904 ms |
+| Rust, operatory bitowe | 57 ms | 23 ms | 500 ms |
+| **RecurLoop** | **77 ms** | **51 ms** | **1 115 ms** |
+
+Teleportacja to 100 000 teleportacji na 3 kubitach. Kolumny 16 i 20
+kubitów to 5 warstw bramek na rejestrze tej wielkości.
 
 Ile razy wolniej od najszybszej wersji, czyli Rust z operatorami bitowymi:
 
-| Implementacja | Teleportacja | Warstwy, 16 kubitów | Warstwy, 20 kubitów |
+| Implementacja | Teleportacja | 16 kubitów | 20 kubitów |
 |---|---:|---:|---:|
 | Python, czysty | 42× | 103× | 129× |
 | Python, NumPy | 389× | 8,0× | 3,3× |
