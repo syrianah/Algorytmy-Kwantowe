@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Rust
+target/
+
+# macOS
+.DS_Store
+
+# LaTeX: pliki pośrednie kompilacji
+*.aux
+*.auxlock
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
