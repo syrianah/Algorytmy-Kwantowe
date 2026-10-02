@@ -52,7 +52,7 @@ recurloop --file przyklady/teleportacja.rl
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
 | `uruchom.sh` | Uruchamia testy i przykłady |
-| `benchmark/` | Ten sam symulator w Pythonie, NumPy i Rust oraz porównanie wydajności |
+| `benchmark/` | Ten sam symulator w Pythonie, NumPy i Rust oraz porównanie wydajności, wyniki w `benchmark/README.md` |
 
 ## Język obwodów
 
