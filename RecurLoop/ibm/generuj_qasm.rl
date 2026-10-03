@@ -11,3 +11,7 @@ seed 2026
 teleportacja()
 teleportacja_odroczona()
 kontrola()
+superdense_00()
+superdense_01()
+superdense_10()
+superdense_11()

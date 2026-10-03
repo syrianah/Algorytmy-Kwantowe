@@ -58,6 +58,7 @@ recurloop --file przyklady/teleportacja.rl
 | `ibm/` | Teleportacja na prawdziwym komputerze kwantowym IBM |
 | `testy.rl` | Testy wszystkich bramek, pomiaru i wierności |
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
+| `przyklady/superdense.rl` | Kodowanie supergęste: cztery wiadomości krok po kroku i 10 000 przebiegów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
 | `uruchom.sh` | Uruchamia testy i przykłady |
 | `benchmark/` | Ten sam symulator w Pythonie, NumPy i Rust oraz porównanie wydajności, wyniki w `benchmark/README.md` |
@@ -86,6 +87,7 @@ recurloop --file przyklady/teleportacja.rl
 | `CNOT c, t`, `CZ c, t` | Bramki kontrolowane |
 | `SWAP a, b` | Zamiana kubitów |
 | `TOFFOLI c1, c2, t` | Podwójnie kontrolowane NOT |
+| `barrier a, b` | Bez działania w symulacji. Na sprzęcie zabrania kompilatorowi upraszczać obwód ponad tym miejscem |
 
 ### Pomiar i przygotowanie
 
@@ -133,6 +135,7 @@ wyniku 0, po czym stan jest przywracany.
 | Teleportacja zawsze zakłada wynik pomiaru 01 i korektę X | Losowy pomiar i korekty X oraz Z zależne od wyniku |
 | Brak sprawdzenia, że Bob dostał właściwy stan | `expect bob == psi` po każdej teleportacji |
 | Warunek z `\|\|` w `Qubit::new` jest zawsze prawdziwy | Stany powstają tylko przez unitarne bramki |
+| Superdense coding wybiera rzutnik pomiaru na podstawie znanej wiadomości | Bob mierzy oba kubity zwykłym pomiarem i dopiero wtedy poznaje wiadomość |
 
 ## Ograniczenia RecurLoop znalezione przy pisaniu biblioteki
 
@@ -173,7 +176,7 @@ ale warto je zgłosić autorowi języka:
 
 ## Plany
 
-1. Superdense coding i nierówność CHSH, do porównania z wersjami w Pythonie.
+1. Nierówność CHSH, do porównania z wersjami w Pythonie i Qiskit.
 2. Algorytmy Deutscha-Jozsy i Grovera.
 3. Kwantowa transformata Fouriera.
 4. Rejestry kubitów, na przykład `qubits r[4]`, i bramki na całych rejestrach.

@@ -1,4 +1,4 @@
-# Teleportacja na komputerze kwantowym IBM
+# Teleportacja i kodowanie supergęste na komputerze kwantowym IBM
 
 Te same obwody napisane w naszym języku można symulować albo skompilować do
 OpenQASM 3 i uruchomić na prawdziwym procesorze IBM. Backend wybiera się
@@ -6,7 +6,7 @@ przez dołączoną bibliotekę: `quantum.rl` symuluje, a `qasm.rl` kompiluje.
 
 | Plik | Zawartość |
 |---|---|
-| `obwody.rl` | Trzy obwody w naszym języku, bez wyboru backendu |
+| `obwody.rl` | Obwody w naszym języku, bez wyboru backendu |
 | `symuluj.rl` | Symulacja obwodów biblioteką `quantum.rl` |
 | `generuj_qasm.rl` | Kompilacja obwodów do plików `.qasm` biblioteką `qasm.rl` |
 | `*.qasm` | Wygenerowane programy OpenQASM 3 |
@@ -23,11 +23,21 @@ przez dołączoną bibliotekę: `quantum.rl` symuluje, a `qasm.rl` kompiluje.
   końcu. Działa na każdym procesorze.
 - **`kontrola`** to tylko przygotowanie i odwrócenie stanu na jednym kubicie.
   Pokazuje, ile błędów wnosi sam sprzęt bez teleportacji.
+- **`superdense_00`, `superdense_01`, `superdense_10`, `superdense_11`** to
+  kodowanie supergęste. Alicja wysyła Bobowi dwa bity, przekazując mu jeden
+  kubit ze wspólnej pary splątanej. Każdy obwód wysyła inną wiadomość, a
+  bity Boba trafiają do rejestrów `odczyt1` i `odczyt2`.
 
 Na sprzęcie nie da się odczytać stanu Boba wprost. Dlatego `expect bob == psi`
 odwraca na kubicie Boba przygotowanie stanu psi i mierzy go do bitu
 `expect_bob`. Udana teleportacja daje zawsze 0. Gdyby stan Boba był
 całkowicie przypadkowy, wynik 0 wypadałby tylko w połowie przebiegów.
+
+W kodowaniu supergęstym sukces oznacza, że Bob odczytał dokładnie wysłane
+bity. Zgadując, trafiałby w 25% przebiegów. Wynik każdego z tych obwodów jest
+znany z góry, więc kompilator Qiskit mógłby usunąć z nich splątanie i
+zostawić same bramki X przed pomiarem. Zapobiegają temu `barrier alicja, bob`
+między przygotowaniem pary, kodowaniem u Alicji i dekodowaniem u Boba.
 
 ## Krok po kroku
 
@@ -76,6 +86,9 @@ python3 uruchom_ibm.py
 python3 uruchom_ibm.py --wyslij
 ```
 
+Domyślnie wysyłane są wszystkie obwody. Flaga `--zestaw teleportacja` albo
+`--zestaw superdense` wybiera tylko jedną grupę.
+
 Skrypt wypisze identyfikator zadania i poczeka na wynik. Kolejka może trwać
 od minut do godzin. Wyniki można też pobrać później:
 
@@ -92,6 +105,14 @@ Wyniki na modelach szumu, po 4000 przebiegów każdego obwodu:
 | Brisbane | 94,8% | 96,4% | 99,5% |
 | Torino | 96,9% | 97,9% | 99,8% |
 | Fez | 98,6% | 98,7% | 100,0% |
+
+Kodowanie supergęste na tych samych modelach, sukces dla wiadomości:
+
+| Procesor | 00 | 01 | 10 | 11 |
+|---|---:|---:|---:|---:|
+| Brisbane | 96,3% | 95,2% | 96,8% | 95,2% |
+| Torino | 97,9% | 97,2% | 97,9% | 97,2% |
+| Fez | 99,3% | 98,4% | 98,7% | 97,9% |
 
 Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
 

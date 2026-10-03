@@ -15,16 +15,21 @@ Użycie, z katalogu ibm, po wygenerowaniu plików .qasm:
   python3 uruchom_ibm.py                     # sprawdzenie, nic nie wysyła
   python3 uruchom_ibm.py --wyslij            # wysyła do najmniej zajętego procesora
   python3 uruchom_ibm.py --procesor ibm_fez --wyslij
+  python3 uruchom_ibm.py --zestaw superdense --wyslij   # tylko kodowanie supergęste
   python3 uruchom_ibm.py --zadanie ID        # pobiera wyniki wysłanego wcześniej zadania
+                                             # (z tym samym --zestaw co przy wysyłaniu)
 """
 
 import argparse
 import os
+from collections import Counter
 
 from qiskit import transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
 
-from wspolne import OBWODY, podsumuj, wczytaj
+from wspolne import OBWODY, SUPERDENSE, TELEPORTACJA, odczyty_boba, podsumuj, wczytaj
+
+ZESTAWY = {"wszystko": OBWODY, "teleportacja": TELEPORTACJA, "superdense": SUPERDENSE}
 
 
 def main():
@@ -33,17 +38,19 @@ def main():
     parser.add_argument("--strzaly", type=int, default=4000, help="liczba powtórzeń każdego obwodu")
     parser.add_argument("--wyslij", action="store_true", help="naprawdę wyślij zadanie do kolejki IBM")
     parser.add_argument("--zadanie", help="pobierz wyniki zadania o podanym ID")
+    parser.add_argument("--zestaw", choices=ZESTAWY, default="wszystko", help="które obwody uruchomić")
     args = parser.parse_args()
 
     serwis = polacz()
 
+    nazwy = ZESTAWY[args.zestaw]
     if args.zadanie:
         zadanie = serwis.job(args.zadanie)
         print(f"Zadanie {zadanie.job_id()} na {zadanie.backend().name}, stan: {zadanie.status()}")
-        pokaz_wyniki(zadanie.result(), OBWODY, args.strzaly)
+        pokaz_wyniki(zadanie.result(), nazwy, args.strzaly)
         return
 
-    obwody = [wczytaj(nazwa) for nazwa in OBWODY]
+    obwody = [wczytaj(nazwa) for nazwa in nazwy]
     if args.procesor:
         procesor = serwis.backend(args.procesor)
     else:
@@ -62,7 +69,7 @@ def main():
     zadanie = SamplerV2(mode=procesor).run(skompilowane, shots=args.strzaly)
     print(f"\nWysłano zadanie {zadanie.job_id()}. Czekam na wynik, co może potrwać.")
     print(f"Wyniki można też pobrać później: python3 uruchom_ibm.py --zadanie {zadanie.job_id()}")
-    pokaz_wyniki(zadanie.result(), OBWODY, args.strzaly)
+    pokaz_wyniki(zadanie.result(), nazwy, args.strzaly)
 
 
 def polacz():
@@ -80,8 +87,13 @@ def polacz():
 def pokaz_wyniki(wynik, nazwy, strzaly):
     print()
     for nazwa, w in zip(nazwy, wynik):
-        print(f"  {nazwa:24s} sukces: {podsumuj(nazwa, w.data, strzaly) * 100:5.1f}%")
-    print("\nUdana teleportacja daje 100% na idealnym sprzęcie, a całkowicie losowy wynik 50%.")
+        linia = f"  {nazwa:24s} sukces: {podsumuj(nazwa, w.data, strzaly) * 100:5.1f}%"
+        if nazwa.startswith("superdense_"):
+            odczyty = Counter(odczyty_boba(w.data))
+            linia += "   Bob odczytał: " + ", ".join(f"{k} {odczyty[k]}" for k in ("00", "01", "10", "11"))
+        print(linia)
+    print("\nNa idealnym sprzęcie każdy obwód daje 100%. Losowy wynik to 50% dla teleportacji")
+    print("i 25% dla kodowania supergęstego.")
 
 
 if __name__ == "__main__":

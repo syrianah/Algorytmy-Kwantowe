@@ -248,6 +248,15 @@ let Quantum:swap = fn (handle:i64, a:i64, b:i64) -> i64 {
     return 0
 }
 
+// Bariera nie zmienia stanu. Ma znaczenie tylko na sprzęcie, gdzie zabrania
+// kompilatorowi upraszczać obwód ponad nią (zob. qasm.rl).
+let Quantum:fence = fn (handle:i64, a:i64, b:i64) -> i64 {
+    var s:Quantum:State* = cast(Quantum:State*, handle)
+    Quantum:check_qubit(s, a)
+    Quantum:check_qubit(s, b)
+    return 0
+}
+
 // -----------------------------------------------------------------------------
 // Pomiar i przygotowanie stanów
 // -----------------------------------------------------------------------------
@@ -513,6 +522,7 @@ syntax CNOT <c:expr> "," <t:expr> => Quantum:x(qs, ${c}, 0 - 1, ${t})
 syntax CZ <c:expr> "," <t:expr> => Quantum:z(qs, ${c}, ${t})
 syntax SWAP <a:expr> "," <b:expr> => Quantum:swap(qs, ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Quantum:x(qs, ${c1}, ${c2}, ${t})
+syntax barrier <a:expr> "," <b:expr> => Quantum:fence(qs, ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Quantum:do_measure(qs, ${t})
 syntax probability <t:id> "->" <name:id> => var ${name} = Quantum:prob_one(qs, ${t})

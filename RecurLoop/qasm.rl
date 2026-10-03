@@ -13,6 +13,9 @@
 // - `prepare q random` losuje kąty w czasie kompilacji i wpisuje je do pliku.
 // - `expect q == ref` odwraca przygotowanie ref na q i mierzy q do bitu
 //   expect_q. Na idealnym sprzęcie ten bit zawsze wynosi 0.
+// - `barrier a, b` zabrania kompilatorowi Qiskit upraszczać obwód ponad
+//   tym miejscem. Bez niej obwód o z góry znanym wyniku, jak kodowanie
+//   supergęste, zostałby zredukowany do samych bramek X i pomiarów.
 // - `when bit { ... }` staje się warunkiem `if` wykonywanym na komputerze
 //   kwantowym w trakcie obwodu.
 // - `probability`, `fidelity` i `check` nie istnieją, bo stanu kwantowego
@@ -234,6 +237,7 @@ syntax CNOT <c:expr> "," <t:expr> => Qasm:g2(qs, "cx", ${c}, ${t})
 syntax CZ <c:expr> "," <t:expr> => Qasm:g2(qs, "cz", ${c}, ${t})
 syntax SWAP <a:expr> "," <b:expr> => Qasm:g2(qs, "swap", ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Qasm:g3(qs, "ccx", ${c1}, ${c2}, ${t})
+syntax barrier <a:expr> "," <b:expr> => Qasm:g2(qs, "barrier", ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Qasm:do_measure(qs, ${t}, "${name}")
 syntax reset <t:expr> => Qasm:g1(qs, "reset", ${t})
