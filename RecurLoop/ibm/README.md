@@ -1,4 +1,4 @@
-# Teleportacja i kodowanie supergęste na komputerze kwantowym IBM
+# Teleportacja, kodowanie supergęste i CHSH na komputerze kwantowym IBM
 
 Te same obwody napisane w naszym języku można symulować albo skompilować do
 OpenQASM 3 i uruchomić na prawdziwym procesorze IBM. Backend wybiera się
@@ -27,6 +27,12 @@ przez dołączoną bibliotekę: `quantum.rl` symuluje, a `qasm.rl` kompiluje.
   kodowanie supergęste. Alicja wysyła Bobowi dwa bity, przekazując mu jeden
   kubit ze wspólnej pary splątanej. Każdy obwód wysyła inną wiadomość, a
   bity Boba trafiają do rejestrów `odczyt1` i `odczyt2`.
+- **`chsh_00`, `chsh_01`, `chsh_10`, `chsh_11`** to gra CHSH. Alicja dostaje
+  pytanie x, Bob pytanie y, i wygrywają, gdy ich odpowiedzi a i b spełniają
+  a XOR b = x AND y. Obwód `chsh_XY` gra z pytaniami x = X i y = Y.
+  Klasycznie da się wygrać najwyżej 75% gier, a z parą splątaną 85,4%.
+  Ze średniej wygranych w czterech obwodach liczona jest wartość
+  S = 8 * średnia - 4. Klasycznie S <= 2, kwantowo do 2 sqrt(2) = 2,83.
 
 Na sprzęcie nie da się odczytać stanu Boba wprost. Dlatego `expect bob == psi`
 odwraca na kubicie Boba przygotowanie stanu psi i mierzy go do bitu
@@ -87,7 +93,7 @@ python3 uruchom_ibm.py --wyslij
 ```
 
 Domyślnie wysyłane są wszystkie obwody. Flaga `--zestaw teleportacja` albo
-`--zestaw superdense` wybiera tylko jedną grupę.
+`--zestaw superdense` albo `--zestaw chsh` wybiera tylko jedną grupę.
 
 Skrypt wypisze identyfikator zadania i poczeka na wynik. Kolejka może trwać
 od minut do godzin. Wyniki można też pobrać później:
@@ -113,6 +119,14 @@ Kodowanie supergęste na tych samych modelach, sukces dla wiadomości:
 | Brisbane | 96,3% | 95,2% | 96,8% | 95,2% |
 | Torino | 97,9% | 97,2% | 97,9% | 97,2% |
 | Fez | 99,3% | 98,4% | 98,7% | 97,9% |
+
+Gra CHSH na tych samych modelach, wygrane dla pytań x y i wartość S:
+
+| Procesor | 00 | 01 | 10 | 11 | S |
+|---|---:|---:|---:|---:|---:|
+| Brisbane | 83,9% | 84,0% | 82,2% | 83,4% | 2,670 |
+| Torino | 84,1% | 84,8% | 83,2% | 84,4% | 2,729 |
+| Fez | 84,8% | 83,8% | 84,5% | 84,7% | 2,754 |
 
 Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
 

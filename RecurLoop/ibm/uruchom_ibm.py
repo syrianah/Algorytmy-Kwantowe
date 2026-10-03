@@ -16,6 +16,7 @@ Użycie, z katalogu ibm, po wygenerowaniu plików .qasm:
   python3 uruchom_ibm.py --wyslij            # wysyła do najmniej zajętego procesora
   python3 uruchom_ibm.py --procesor ibm_fez --wyslij
   python3 uruchom_ibm.py --zestaw superdense --wyslij   # tylko kodowanie supergęste
+  python3 uruchom_ibm.py --zestaw chsh --wyslij         # tylko gra CHSH
   python3 uruchom_ibm.py --zadanie ID        # pobiera wyniki wysłanego wcześniej zadania
                                              # (z tym samym --zestaw co przy wysyłaniu)
 """
@@ -27,9 +28,9 @@ from collections import Counter
 from qiskit import transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
 
-from wspolne import OBWODY, SUPERDENSE, TELEPORTACJA, odczyty_boba, podsumuj, wczytaj
+from wspolne import CHSH, OBWODY, SUPERDENSE, TELEPORTACJA, odczyty_boba, podsumuj, wartosc_s, wczytaj
 
-ZESTAWY = {"wszystko": OBWODY, "teleportacja": TELEPORTACJA, "superdense": SUPERDENSE}
+ZESTAWY = {"wszystko": OBWODY, "teleportacja": TELEPORTACJA, "superdense": SUPERDENSE, "chsh": CHSH}
 
 
 def main():
@@ -86,14 +87,19 @@ def polacz():
 
 def pokaz_wyniki(wynik, nazwy, strzaly):
     print()
+    sukcesy = {}
     for nazwa, w in zip(nazwy, wynik):
-        linia = f"  {nazwa:24s} sukces: {podsumuj(nazwa, w.data, strzaly) * 100:5.1f}%"
+        sukcesy[nazwa] = podsumuj(nazwa, w.data, strzaly)
+        linia = f"  {nazwa:24s} sukces: {sukcesy[nazwa] * 100:5.1f}%"
         if nazwa.startswith("superdense_"):
             odczyty = Counter(odczyty_boba(w.data))
             linia += "   Bob odczytał: " + ", ".join(f"{k} {odczyty[k]}" for k in ("00", "01", "10", "11"))
         print(linia)
-    print("\nNa idealnym sprzęcie każdy obwód daje 100%. Losowy wynik to 50% dla teleportacji")
-    print("i 25% dla kodowania supergęstego.")
+    if all(n in sukcesy for n in CHSH):
+        print(f"\n  CHSH: S = {wartosc_s([sukcesy[n] for n in CHSH]):.3f}"
+              " (klasycznie najwyżej 2, idealnie 2,828)")
+    print("\nNa idealnym sprzęcie teleportacja i kodowanie supergęste dają 100%, a gra CHSH 85,4%.")
+    print("Losowy wynik to 50% dla teleportacji, 25% dla kodowania supergęstego i 50% dla CHSH.")
 
 
 if __name__ == "__main__":

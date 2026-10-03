@@ -7,7 +7,8 @@ from qiskit import qasm3
 KATALOG = Path(__file__).resolve().parent
 TELEPORTACJA = ["teleportacja", "teleportacja_odroczona", "kontrola"]
 SUPERDENSE = ["superdense_00", "superdense_01", "superdense_10", "superdense_11"]
-OBWODY = TELEPORTACJA + SUPERDENSE
+CHSH = ["chsh_00", "chsh_01", "chsh_10", "chsh_11"]
+OBWODY = TELEPORTACJA + SUPERDENSE + CHSH
 
 
 def wczytaj(nazwa):
@@ -27,6 +28,8 @@ def podsumuj(nazwa, dane, strzaly):
     """Zwraca odsetek udanych przebiegów obwodu."""
     if nazwa.startswith("superdense_"):
         return podsumuj_superdense(nazwa, dane, strzaly)
+    if nazwa.startswith("chsh_"):
+        return podsumuj_chsh(nazwa, dane, strzaly)
     return podsumuj_expect(nazwa, dane, strzaly)
 
 
@@ -57,3 +60,27 @@ def podsumuj_superdense(nazwa, dane, strzaly):
     """
     wiadomosc = nazwa.removeprefix("superdense_")
     return odczyty_boba(dane).count(wiadomosc) / strzaly
+
+
+def podsumuj_chsh(nazwa, dane, strzaly):
+    """Zwraca odsetek wygranych rund gry CHSH.
+
+    Pytania są zapisane w nazwie obwodu: chsh_10 to x = 1, y = 0. Runda jest
+    wygrana, gdy a XOR b = x AND y.
+    """
+    x, y = (int(c) for c in nazwa.removeprefix("chsh_"))
+    wygrane = sum(
+        (int(a) ^ int(b)) == (x & y)
+        for a, b in zip(dane.a.get_bitstrings(), dane.b.get_bitstrings())
+    )
+    return wygrane / strzaly
+
+
+def wartosc_s(sukcesy):
+    """Wartość S nierówności CHSH ze średniej wygranych w czterech obwodach.
+
+    Dla każdej pary pytań korelacja to E = 2 * wygrane - 1, z przeciwnym znakiem
+    dla x = y = 1. S = E00 + E01 + E10 - E11 = 8 * średnia_wygranych - 4.
+    Klasycznie S <= 2, mechanika kwantowa pozwala na S = 2 sqrt(2) = 2,83.
+    """
+    return 8 * sum(sukcesy) / len(sukcesy) - 4

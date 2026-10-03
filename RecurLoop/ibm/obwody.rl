@@ -102,3 +102,41 @@ circuit superdense_10 {
 circuit superdense_11 {
     return superdense(qs, 1, 1)
 }
+
+// Gra CHSH: Alicja dostaje pytanie x, Bob pytanie y, a wygrywają, gdy
+// a XOR b = x AND y. Klasycznie da się wygrać najwyżej 75% gier, a z parą
+// splątaną około 85,4%. Obwody chsh_XY grają z pytaniami x = X i y = Y.
+// Funkcja zwraca 1 przy wygranej, 0 przy przegranej.
+fn chsh(qs:i64, x:i64, y:i64) -> i64 {
+    qubit alicja
+    qubit bob
+    H alicja
+    CNOT alicja, bob
+    barrier alicja, bob
+    var kat_alicji = cast(f64, x) * pi() / 2.0
+    var kat_boba = pi() / 4.0 - cast(f64, y) * pi() / 2.0
+    RY(0.0 - kat_alicji) alicja
+    RY(0.0 - kat_boba) bob
+    measure alicja -> a
+    measure bob -> b
+    if (a + b) % 2 == x * y {
+        return 1
+    }
+    return 0
+}
+
+circuit chsh_00 {
+    return chsh(qs, 0, 0)
+}
+
+circuit chsh_01 {
+    return chsh(qs, 0, 1)
+}
+
+circuit chsh_10 {
+    return chsh(qs, 1, 0)
+}
+
+circuit chsh_11 {
+    return chsh(qs, 1, 1)
+}

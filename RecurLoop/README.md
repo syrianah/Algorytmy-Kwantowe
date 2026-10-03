@@ -58,6 +58,7 @@ recurloop --file przyklady/teleportacja.rl
 | `ibm/` | Teleportacja na prawdziwym komputerze kwantowym IBM |
 | `testy.rl` | Testy wszystkich bramek, pomiaru i wierności |
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
+| `przyklady/chsh.rl` | Gra CHSH ze splątaniem i bez, wartość S i klasyczna granica |
 | `przyklady/superdense.rl` | Kodowanie supergęste: cztery wiadomości krok po kroku i 10 000 przebiegów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
 | `uruchom.sh` | Uruchamia testy i przykłady |
@@ -135,6 +136,7 @@ wyniku 0, po czym stan jest przywracany.
 | Teleportacja zawsze zakłada wynik pomiaru 01 i korektę X | Losowy pomiar i korekty X oraz Z zależne od wyniku |
 | Brak sprawdzenia, że Bob dostał właściwy stan | `expect bob == psi` po każdej teleportacji |
 | Warunek z `\|\|` w `Qubit::new` jest zawsze prawdziwy | Stany powstają tylko przez unitarne bramki |
+| CHSH zawsze mierzy 01 i obraca kubity o połowę potrzebnego kąta | Prawdziwy pomiar i kąty dające 85,4% wygranych, S = 2,83 |
 | Superdense coding wybiera rzutnik pomiaru na podstawie znanej wiadomości | Bob mierzy oba kubity zwykłym pomiarem i dopiero wtedy poznaje wiadomość |
 
 ## Ograniczenia RecurLoop znalezione przy pisaniu biblioteki
@@ -176,9 +178,8 @@ ale warto je zgłosić autorowi języka:
 
 ## Plany
 
-1. Nierówność CHSH, do porównania z wersjami w Pythonie i Qiskit.
-2. Algorytmy Deutscha-Jozsy i Grovera.
-3. Kwantowa transformata Fouriera.
-4. Rejestry kubitów, na przykład `qubits r[4]`, i bramki na całych rejestrach.
-5. Eksport bibliotek do obrazów `quantum.rli` i `qasm.rli` ładowanych przez
+1. Algorytmy Deutscha-Jozsy i Grovera.
+2. Kwantowa transformata Fouriera.
+3. Rejestry kubitów, na przykład `qubits r[4]`, i bramki na całych rejestrach.
+4. Eksport bibliotek do obrazów `quantum.rli` i `qasm.rli` ładowanych przez
    `--library`.
