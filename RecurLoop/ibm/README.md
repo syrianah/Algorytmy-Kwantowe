@@ -1,313 +1,324 @@
-# Protokoły i algorytmy kwantowe na komputerze kwantowym IBM
+# Quantum protocols and algorithms on an IBM quantum computer
 
-Te same obwody napisane w naszym języku można symulować albo skompilować do
-OpenQASM 3 i uruchomić na prawdziwym procesorze IBM. Backend wybiera się
-przez dołączoną bibliotekę: `quantum.rl` symuluje, a `qasm.rl` kompiluje.
+The same circuits written in our language can be simulated, or compiled to
+OpenQASM 3 and run on a real IBM processor. The backend is chosen by the
+included library: `quantum.rl` simulates and `qasm.rl` compiles.
 
-| Plik | Zawartość |
+| File | Contents |
 |---|---|
-| `obwody.rl` | Obwody w naszym języku, bez wyboru backendu |
-| `symuluj.rl` | Symulacja obwodów biblioteką `quantum.rl` |
-| `generuj_qasm.rl` | Kompilacja obwodów do plików `.qasm` biblioteką `qasm.rl` |
-| `*.qasm` | Wygenerowane programy OpenQASM 3 |
-| `sprawdz_szum.py` | Uruchomienie na modelach szumu procesorów IBM, bez konta |
-| `uruchom_ibm.py` | Uruchomienie na prawdziwym procesorze IBM |
-| `wymagania.txt` | Pakiety Pythona |
+| `circuits.rl` | The circuits in our language, without a choice of backend |
+| `simulate.rl` | Simulates the circuits with the `quantum.rl` library |
+| `generate_qasm.rl` | Compiles the circuits to `.qasm` files with the `qasm.rl` library |
+| `*.qasm` | The generated OpenQASM 3 programs |
+| `check_noise.py` | Runs on noise models of IBM processors, no account needed |
+| `run_ibm.py` | Runs on a real IBM processor |
+| `common.py` | Loading and scoring shared by both scripts |
+| `requirements.txt` | Python packages |
 
-## Obwody
+## Circuits
 
-- **`teleportacja`** to obwód dynamiczny. Alicja mierzy dwa kubity w trakcie
-  obwodu, a procesor od razu stosuje korekty X i Z na kubicie Boba.
-- **`teleportacja_odroczona`** daje ten sam wynik bez pomiarów w trakcie
-  obwodu. Korekty są sterowane kwantowo przez CNOT i CZ, a pomiary są na
-  końcu. Działa na każdym procesorze.
-- **`kontrola`** to tylko przygotowanie i odwrócenie stanu na jednym kubicie.
-  Pokazuje, ile błędów wnosi sam sprzęt bez teleportacji.
-- **`superdense_00`, `superdense_01`, `superdense_10`, `superdense_11`** to
-  kodowanie supergęste. Alicja wysyła Bobowi dwa bity, przekazując mu jeden
-  kubit ze wspólnej pary splątanej. Każdy obwód wysyła inną wiadomość, a
-  bity Boba trafiają do rejestrów `odczyt1` i `odczyt2`.
-- **`chsh_00`, `chsh_01`, `chsh_10`, `chsh_11`** to gra CHSH. Alicja dostaje
-  pytanie x, Bob pytanie y, i wygrywają, gdy ich odpowiedzi a i b spełniają
-  a XOR b = x AND y. Obwód `chsh_XY` gra z pytaniami x = X i y = Y.
-  Klasycznie da się wygrać najwyżej 75% gier, a z parą splątaną 85,4%.
-  Ze średniej wygranych w czterech obwodach liczona jest wartość
-  S = 8 * średnia - 4. Klasycznie S <= 2, kwantowo do 2 sqrt(2) = 2,83.
-- **`qft_0` do `qft_7`** to kwantowa transformata Fouriera z biblioteki
-  `../qft.rl`, w roli jaką pełni w estymacji fazy. Liczba K jest zapisana
-  wyłącznie w fazach trzech kubitów, bez splątania. QFT odwrotna zamienia
-  fazy na liczbę, a pomiar rejestru `wynik` powinien dać K. Zgadując,
-  trafiałoby się w 12,5% przebiegów.
+- **`teleportation`** is a dynamic circuit. Alice measures two qubits
+  mid-circuit and the processor immediately applies the X and Z corrections
+  to Bob's qubit.
+- **`teleportation_deferred`** gives the same result without mid-circuit
+  measurements. The corrections are quantum-controlled through CNOT and CZ,
+  and the measurements come at the end. It runs on any processor.
+- **`control`** only prepares and undoes a state on one qubit. It shows how
+  many errors the hardware adds on its own, without teleportation.
+- **`superdense_00`, `superdense_01`, `superdense_10`, `superdense_11`** are
+  superdense coding. Alice sends Bob two bits by handing him one qubit of a
+  shared entangled pair. Each circuit sends a different message, and Bob's
+  bits go to the `decoded1` and `decoded2` registers.
+- **`chsh_00`, `chsh_01`, `chsh_10`, `chsh_11`** are the CHSH game. Alice
+  gets question x, Bob question y, and they win when their answers a and b
+  satisfy a XOR b = x AND y. Circuit `chsh_XY` plays with questions x = X and
+  y = Y. Classically at most 75% of games can be won; with an entangled pair,
+  85.4%. The average win rate over the four circuits gives the value
+  S = 8 * average - 4. Classically S <= 2; quantum mechanics allows up to
+  2 sqrt(2) = 2.83.
+- **`qft_0` to `qft_7`** are the quantum Fourier transform from the
+  `../qft.rl` library, in the role it plays in phase estimation. The number K
+  is stored only in the phases of three qubits, without entanglement. The
+  inverse QFT turns the phases into a number, and measuring the `result`
+  register should give K. Guessing would be right 12.5% of the time.
 
-Na sprzęcie nie da się odczytać stanu Boba wprost. Dlatego `expect bob == psi`
-odwraca na kubicie Boba przygotowanie stanu psi i mierzy go do bitu
-`expect_bob`. Udana teleportacja daje zawsze 0. Gdyby stan Boba był
-całkowicie przypadkowy, wynik 0 wypadałby tylko w połowie przebiegów.
+Bob's state cannot be read out directly on hardware. So `expect bob == psi`
+undoes the preparation of psi on Bob's qubit and measures it into the bit
+`expect_bob`. A successful teleportation always gives 0. If Bob's state were
+completely random, 0 would come up in only half of the runs.
 
-W kodowaniu supergęstym sukces oznacza, że Bob odczytał dokładnie wysłane
-bity. Zgadując, trafiałby w 25% przebiegów. Wynik każdego z tych obwodów jest
-znany z góry, więc kompilator Qiskit mógłby usunąć z nich splątanie i
-zostawić same bramki X przed pomiarem. Zapobiegają temu `barrier alicja, bob`
-między przygotowaniem pary, kodowaniem u Alicji i dekodowaniem u Boba.
+In superdense coding, success means Bob decoded exactly the bits that were
+sent. Guessing, he would be right 25% of the time. The outcome of each of
+these circuits is known in advance, so the Qiskit compiler could remove the
+entanglement and leave only X gates before the measurement. The
+`barrier alice, bob` statements between preparing the pair, Alice's encoding
+and Bob's decoding prevent that.
 
-## Krok po kroku
+## Step by step
 
-**1. Wygeneruj pliki QASM.** Gotowe pliki są już w repo. Ziarno losowości
-jest stałe, więc ponowne generowanie daje te same pliki.
-
-```bash
-recurloop --file generuj_qasm.rl
-```
-
-**2. Zainstaluj pakiety Pythona.**
+**1. Generate the QASM files.** The generated files are already in the repo.
+The random seed is fixed, so regenerating gives the same files.
 
 ```bash
-pip install -r wymagania.txt
+recurloop --file generate_qasm.rl
 ```
 
-**3. Sprawdź na modelach szumu.** Nie wymaga konta.
+**2. Install the Python packages.**
 
 ```bash
-python3 sprawdz_szum.py
+pip install -r requirements.txt
 ```
 
-**4. Zapisz klucz API.** Klucz znajdziesz na stronie konta IBM Quantum
-Platform. Zapisuje się go raz, lokalnie na komputerze. Nigdy nie wpisuj go
-do plików w repo.
+**3. Check on noise models.** No account needed.
+
+```bash
+python3 check_noise.py
+```
+
+**4. Save the API key.** You find the key on your IBM Quantum Platform
+account page. It is saved once, locally on your computer. Never put it in
+files in the repo.
 
 ```python
 from qiskit_ibm_runtime import QiskitRuntimeService
 QiskitRuntimeService.save_account(
-    channel="ibm_quantum_platform", token="TWÓJ_KLUCZ_API", set_as_default=True)
+    channel="ibm_quantum_platform", token="YOUR_API_KEY", set_as_default=True)
 ```
 
-Zamiast zapisywać konto, można ustawić zmienną środowiskową
-`IBM_QUANTUM_TOKEN` z kluczem i opcjonalnie `IBM_QUANTUM_INSTANCE`.
+Instead of saving the account, you can set the `IBM_QUANTUM_TOKEN`
+environment variable to the key, and optionally `IBM_QUANTUM_INSTANCE`.
 
-**5. Sprawdź połączenie.** Bez flagi `--wyslij` skrypt tylko wybiera procesor
-i kompiluje obwody, niczego nie wysyłając.
+**5. Check the connection.** Without the `--submit` flag the script only
+picks a processor and compiles the circuits, without submitting anything.
 
 ```bash
-python3 uruchom_ibm.py
+python3 run_ibm.py
 ```
 
-**6. Wyślij zadanie.**
+**6. Submit the job.**
 
 ```bash
-python3 uruchom_ibm.py --wyslij
+python3 run_ibm.py --submit
 ```
 
-Domyślnie wysyłane są wszystkie obwody. Flaga `--zestaw teleportacja` albo
-`--zestaw superdense`, `--zestaw chsh` albo `--zestaw qft` wybiera tylko
-jedną grupę.
+All circuits are submitted by default. `--set teleportation`,
+`--set superdense`, `--set chsh` or `--set qft` picks just one group.
 
-Skrypt wypisze identyfikator zadania i poczeka na wynik. Kolejka może trwać
-od minut do godzin. Wyniki można też pobrać później:
+The script prints the job ID and waits for the result. The queue can take
+from minutes to hours. The results can also be fetched later:
 
 ```bash
-python3 uruchom_ibm.py --zadanie ID_ZADANIA
+python3 run_ibm.py --job JOB_ID
 ```
 
-## Czego się spodziewać
+## What to expect
 
-Wyniki na modelach szumu, po 4000 przebiegów każdego obwodu:
+Results on noise models, 4000 runs of each circuit:
 
-| Procesor | teleportacja | teleportacja_odroczona | kontrola |
+| Processor | teleportation | teleportation_deferred | control |
 |---|---:|---:|---:|
-| Brisbane | 94,8% | 96,4% | 99,5% |
-| Torino | 96,9% | 97,9% | 99,8% |
-| Fez | 98,6% | 98,7% | 100,0% |
+| Brisbane | 94.8% | 96.4% | 99.5% |
+| Torino | 96.9% | 97.9% | 99.8% |
+| Fez | 98.6% | 98.7% | 100.0% |
 
-Kodowanie supergęste na tych samych modelach, sukces dla wiadomości:
+Superdense coding on the same models, success for each message:
 
-| Procesor | 00 | 01 | 10 | 11 |
+| Processor | 00 | 01 | 10 | 11 |
 |---|---:|---:|---:|---:|
-| Brisbane | 96,3% | 95,2% | 96,8% | 95,2% |
-| Torino | 97,9% | 97,2% | 97,9% | 97,2% |
-| Fez | 99,3% | 98,4% | 98,7% | 97,9% |
+| Brisbane | 96.3% | 95.2% | 96.8% | 95.2% |
+| Torino | 97.9% | 97.2% | 97.9% | 97.2% |
+| Fez | 99.3% | 98.4% | 98.7% | 97.9% |
 
-Gra CHSH na tych samych modelach, wygrane dla pytań x y i wartość S:
+The CHSH game on the same models, wins for questions x y and the S value:
 
-| Procesor | 00 | 01 | 10 | 11 | S |
+| Processor | 00 | 01 | 10 | 11 | S |
 |---|---:|---:|---:|---:|---:|
-| Brisbane | 83,9% | 84,0% | 82,2% | 83,4% | 2,670 |
-| Torino | 84,1% | 84,8% | 83,2% | 84,4% | 2,729 |
-| Fez | 84,8% | 83,8% | 84,5% | 84,7% | 2,754 |
+| Brisbane | 83.9% | 84.0% | 82.2% | 83.4% | 2.670 |
+| Torino | 84.1% | 84.8% | 83.2% | 84.4% | 2.729 |
+| Fez | 84.8% | 83.8% | 84.5% | 84.7% | 2.754 |
 
-QFT na tych samych modelach, odsetek przebiegów z odczytaną liczbą K:
+The QFT on the same models, fraction of runs that read back the number K:
 
-| Procesor | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | Średnio |
+| Processor | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | Average |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Brisbane | 91,1% | 90,7% | 90,4% | 91,8% | 91,5% | 90,3% | 90,7% | 92,1% | 91,1% |
-| Torino | 94,0% | 93,6% | 94,0% | 93,0% | 93,5% | 91,9% | 93,7% | 92,9% | 93,3% |
-| Fez | 97,2% | 95,9% | 95,5% | 95,0% | 96,2% | 95,6% | 95,7% | 94,0% | 95,6% |
+| Brisbane | 91.1% | 90.7% | 90.4% | 91.8% | 91.5% | 90.3% | 90.7% | 92.1% | 91.1% |
+| Torino | 94.0% | 93.6% | 94.0% | 93.0% | 93.5% | 91.9% | 93.7% | 92.9% | 93.3% |
+| Fez | 97.2% | 95.9% | 95.5% | 95.0% | 96.2% | 95.6% | 95.7% | 94.0% | 95.6% |
 
-Obwody QFT po kompilacji mają po 9 bramek dwukubitowych, więcej niż
-pozostałe, stąd niższe wyniki.
+After compilation the QFT circuits have 9 two-qubit gates each, more than
+the others, hence the lower results.
 
-Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
+Results on real hardware will probably be somewhat lower:
 
-- **Modele pochodzą ze starszych kalibracji.** Aktualne parametry procesora
-  mogą być lepsze albo gorsze.
-- **Model prawdopodobnie nie oddaje w pełni czasu oczekiwania na pomiar
-  w obwodzie dynamicznym.** Na sprzęcie kubit Boba czeka, aż procesor zmierzy kubity Alicji i podejmie
-  decyzję. W tym czasie traci spójność, więc obwód `teleportacja` może
-  wypaść gorzej niż `teleportacja_odroczona`.
-- **Wynik zależy od wylosowanego stanu psi.** Niektóre stany są bardziej
-  wrażliwe na konkretne błędy sprzętu.
+- **The models come from older calibrations.** The processor's current
+  parameters may be better or worse.
+- **The model probably does not fully capture the wait for a mid-circuit
+  measurement in a dynamic circuit.** On hardware Bob's qubit waits while the
+  processor measures Alice's qubits and makes the decision. It loses
+  coherence meanwhile, so `teleportation` may do worse than
+  `teleportation_deferred`.
+- **The result depends on the random psi state.** Some states are more
+  sensitive to particular hardware errors.
 
-Każdy wynik wyraźnie powyżej 50% pokazuje, że teleportacja działa. Różnica
-między `kontrola` a obwodami teleportacji to koszt samego protokołu.
+Any result clearly above 50% shows that teleportation works. The difference
+between `control` and the teleportation circuits is the cost of the protocol
+itself.
 
-## Wyniki na prawdziwym sprzęcie
+## Results on real hardware
 
-Podsumowanie. Ostatnia kolumna to wynik losowy albo najlepszy możliwy bez
-splątania. Wszystkie zadania razem zajęły 28 sekund czasu procesora.
+Summary. The last column is the random result or the best one possible
+without entanglement. All jobs together took 28 seconds of processor time.
 
-| Algorytm | Procesor | Wynik | Bez kwantowej przewagi |
+| Algorithm | Processor | Result | Without quantum advantage |
 |---|---|---:|---:|
-| Teleportacja | `ibm_kingston` | 94,5% | 50% |
-| Kodowanie supergęste | `ibm_fez` | 96,8% | 25% |
-| Gra CHSH | `ibm_fez` | S = 2,70 | S ≤ 2 |
-| QFT, odczyt liczby z faz | `ibm_fez` | 90,5% | 12,5% |
+| Teleportation | `ibm_kingston` | 94.5% | 50% |
+| Superdense coding | `ibm_fez` | 96.8% | 25% |
+| CHSH game | `ibm_fez` | S = 2.70 | S ≤ 2 |
+| QFT, reading a number from phases | `ibm_fez` | 90.5% | 12.5% |
 
-### Teleportacja
+The jobs ran before the project was translated to English, when the circuits
+and registers had Polish names (for example `teleportacja`, `alicja`,
+`odczyt1`, `wynik`). The gates are identical to the current `.qasm` files,
+and `run_ibm.py --job` reads both the old and the new register names.
 
-3 października 2026 obwody uruchomiono na procesorze `ibm_kingston`
-(156 kubitów), po 4000 przebiegów każdego obwodu. Zadanie
-`db04selj371s73dnt1p0` zajęło 5 sekund czasu procesora.
+### Teleportation
 
-| Obwód | Sukces na `ibm_kingston` |
+On 3 October 2026 the circuits ran on the `ibm_kingston` processor
+(156 qubits), 4000 runs of each circuit. Job `db04selj371s73dnt1p0` took
+5 seconds of processor time.
+
+| Circuit | Success on `ibm_kingston` |
 |---|---:|
-| teleportacja | 94,5% |
-| teleportacja_odroczona | 96,4% |
-| kontrola | 98,9% |
+| teleportation | 94.5% |
+| teleportation_deferred | 96.4% |
+| control | 98.9% |
 
-Wyniki obwodu `teleportacja` w podziale na pomiary Alicji:
+Results of the `teleportation` circuit broken down by Alice's measurements:
 
-| m1 m2 | Liczba przebiegów | Korekta na kubicie Boba | Sukces |
+| m1 m2 | Runs | Correction on Bob's qubit | Success |
 |---|---:|---|---:|
-| 00 | 1023 | brak | 92,5% |
-| 01 | 1019 | X | 95,2% |
-| 10 | 1042 | Z | 94,5% |
-| 11 | 916 | X i Z | 95,7% |
+| 00 | 1023 | none | 92.5% |
+| 01 | 1019 | X | 95.2% |
+| 10 | 1042 | Z | 94.5% |
+| 11 | 916 | X and Z | 95.7% |
 
-Co z tego wynika:
+What this shows:
 
-- **Teleportacja działa na prawdziwym sprzęcie.** Stan psi trafia do Boba
-  w około 95% przypadków. Odchylenie standardowe przy 4000 przebiegach to
-  około 0,4 punktu procentowego.
-- **Korekty sterowane pomiarem działają.** Każdy z czterech wyników Alicji
-  pojawia się w około 25% przebiegów i we wszystkich czterech przypadkach Bob
-  dostaje poprawny stan. Bez korekt X i Z trzy z czterech gałęzi dałyby wynik
-  bliski losowemu.
-- **Obwód dynamiczny wypada gorzej od odroczonego** o około 2 punkty, mimo
-  że ma mniej bramek dwukubitowych (2 wobec 7). To koszt czekania kubitu Boba
-  na pomiar i decyzję procesora, o którym mowa wyżej.
-- **Około 1,1% błędów to sam odczyt.** Tyle wynosi błąd obwodu `kontrola`,
-  w którym kompilator usunął przygotowanie i odwrócenie stanu jako wzajemnie
-  się znoszące, więc został sam pomiar.
-- **Wynik jest najbliżej modelu Brisbane**, czyli bliżej najsłabszego
-  z modeli szumu, choć Kingston jest procesorem nowszej generacji.
+- **Teleportation works on real hardware.** The psi state reaches Bob in
+  about 95% of cases. The standard deviation at 4000 runs is about 0.4
+  percentage points.
+- **Measurement-controlled corrections work.** Each of Alice's four results
+  comes up in about 25% of the runs, and in all four cases Bob gets the right
+  state. Without the X and Z corrections, three of the four branches would
+  give a result close to random.
+- **The dynamic circuit does worse than the deferred one** by about 2 points,
+  even though it has fewer two-qubit gates (2 versus 7). That is the cost of
+  Bob's qubit waiting for the measurement and the processor's decision,
+  mentioned above.
+- **About 1.1% of errors come from readout alone.** That is the error of the
+  `control` circuit, in which the compiler removed the preparation and its
+  inverse as cancelling out, leaving only the measurement.
+- **The result is closest to the Brisbane model**, the weakest of the noise
+  models, even though Kingston is a newer-generation processor.
 
-### Kodowanie supergęste
+### Superdense coding
 
-Tego samego dnia cztery obwody kodowania supergęstego uruchomiono na
-procesorze `ibm_fez` (156 kubitów), po 4000 przebiegów każdego. Zadanie
-`db0533lj371s73dntdm0` zajęło 6 sekund czasu procesora.
+The same day the four superdense coding circuits ran on the `ibm_fez`
+processor (156 qubits), 4000 runs each. Job `db0533lj371s73dntdm0` took
+6 seconds of processor time.
 
-| Wysłana wiadomość | Bob odczytał 00 | 01 | 10 | 11 | Sukces | Model Fez |
+| Message sent | Bob read 00 | 01 | 10 | 11 | Success | Fez model |
 |---|---:|---:|---:|---:|---:|---:|
-| 00 | **3861** | 63 | 58 | 18 | 96,5% | 99,3% |
-| 01 | 40 | **3918** | 10 | 32 | 98,0% | 98,4% |
-| 10 | 76 | 15 | **3822** | 87 | 95,5% | 98,7% |
-| 11 | 10 | 58 | 53 | **3879** | 97,0% | 97,9% |
+| 00 | **3861** | 63 | 58 | 18 | 96.5% | 99.3% |
+| 01 | 40 | **3918** | 10 | 32 | 98.0% | 98.4% |
+| 10 | 76 | 15 | **3822** | 87 | 95.5% | 98.7% |
+| 11 | 10 | 58 | 53 | **3879** | 97.0% | 97.9% |
 
-Co z tego wynika:
+What this shows:
 
-- **Jeden kubit przenosi dwa bity.** Bob odczytuje właściwą wiadomość
-  średnio w 96,8% przebiegów. Zgadując, trafiałby w 25%.
-- **Błędy dotyczą zwykle jednego bitu.** Odczyt różniący się od wiadomości
-  na obu bitach naraz zdarza się od 10 do 18 razy na 4000 przebiegów. To
-  pasuje do niezależnych błędów bramek i odczytu na każdym kubicie.
-- **Sprzęt wypadł o 0,4 do 3,2 punktu gorzej od modelu Fez.** Model pochodzi
-  ze starszej kalibracji, a parametry procesora zmieniają się z dnia na dzień.
-- **Bariery są konieczne.** Bez `barrier alicja, bob` kompilator zamieniłby
-  każdy z tych obwodów w bramki X przed pomiarem. Wynik byłby wtedy prawie
-  idealny, ale bez splątania, więc nie świadczyłby o niczym.
+- **One qubit carries two bits.** Bob decodes the right message in 96.8% of
+  runs on average. Guessing, he would be right 25% of the time.
+- **Errors usually affect a single bit.** A read that differs from the
+  message in both bits at once happens 10 to 18 times per 4000 runs. That
+  fits independent gate and readout errors on each qubit.
+- **The hardware did 0.4 to 3.2 points worse than the Fez model.** The model
+  comes from an older calibration, and the processor's parameters change from
+  day to day.
+- **The barriers are necessary.** Without `barrier alice, bob` the compiler
+  would turn each of these circuits into X gates before the measurement. The
+  result would then be almost perfect, but without entanglement, so it would
+  prove nothing.
 
-### Gra CHSH
+### The CHSH game
 
-Tego samego dnia cztery obwody gry CHSH uruchomiono na procesorze `ibm_fez`,
-po 4000 przebiegów każdego. Zadanie `db05ba492g1c7399tjb0` zajęło 6 sekund
-czasu procesora.
+The same day the four CHSH game circuits ran on the `ibm_fez` processor,
+4000 runs each. Job `db05ba492g1c7399tjb0` took 6 seconds of processor time.
 
-| Pytania x y | Wygrane na `ibm_fez` | Model Fez | Ideał |
+| Questions x y | Wins on `ibm_fez` | Fez model | Ideal |
 |---|---:|---:|---:|
-| 00 | 84,3% | 84,8% | 85,4% |
-| 01 | 84,4% | 83,8% | 85,4% |
-| 10 | 83,9% | 84,5% | 85,4% |
-| 11 | 82,6% | 84,7% | 85,4% |
-| **S** | **2,704** | 2,754 | 2,828 |
+| 00 | 84.3% | 84.8% | 85.4% |
+| 01 | 84.4% | 83.8% | 85.4% |
+| 10 | 83.9% | 84.5% | 85.4% |
+| 11 | 82.6% | 84.7% | 85.4% |
+| **S** | **2.704** | 2.754 | 2.828 |
 
-Co z tego wynika:
+What this shows:
 
-- **Nierówność Bella jest złamana.** S = 2,704 ± 0,023, czyli o 0,70 ponad
-  klasyczną granicę 2. To ponad 30 odchyleń standardowych, więc wynik nie
-  jest przypadkiem statystycznym.
-- **Alicja i Bob wygrali średnio 83,8% gier.** Żadna strategia klasyczna
-  nie daje więcej niż 75%, nawet gdy gracze przed grą uzgodnią wspólne
-  losowe bity.
-- **Wynik jest bliski ideału mimo szumu.** Szum obniżył S z 2,828 do 2,704,
-  czyli o około 4%. Obwód ma tylko jedną bramkę dwukubitową.
-- **To samo zastrzeżenie co przy każdym takim teście na jednym chipie.**
-  Kubity Alicji i Boba leżą obok siebie, a pytania są wpisane w obwód przed
-  uruchomieniem. Pomiar nie zamyka więc luki lokalności tak jak
-  eksperymenty z odległymi detektorami, ale pokazuje korelacje, których
-  nie da się uzyskać z klasycznych bitów.
+- **The Bell inequality is violated.** S = 2.704 ± 0.023, which is 0.70
+  above the classical bound of 2. That is over 30 standard deviations, so the
+  result is not a statistical fluke.
+- **Alice and Bob won 83.8% of the games on average.** No classical strategy
+  gives more than 75%, even if the players agree on shared random bits before
+  the game.
+- **The result is close to ideal despite the noise.** Noise lowered S from
+  2.828 to 2.704, by about 4%. The circuit has only one two-qubit gate.
+- **The same caveat as for any such test on a single chip.** Alice's and
+  Bob's qubits sit next to each other, and the questions are written into the
+  circuit before it runs. The measurement therefore does not close the
+  locality loophole the way experiments with distant detectors do, but it
+  does show correlations that classical bits cannot produce.
 
-### Kwantowa transformata Fouriera
+### The quantum Fourier transform
 
-Tego samego dnia osiem obwodów QFT uruchomiono na procesorze `ibm_fez`, po
-4000 przebiegów każdego. Zadanie `db05kfc92g1c7399ttag` zajęło 11 sekund
-czasu procesora.
+The same day the eight QFT circuits ran on the `ibm_fez` processor, 4000 runs
+each. Job `db05kfc92g1c7399ttag` took 11 seconds of processor time.
 
-| Zapisana liczba K | Odczytano K | Model Fez | Błąd jednego bitu | Większy błąd |
+| Stored number K | Read K | Fez model | One-bit error | Larger error |
 |---|---:|---:|---:|---:|
-| 0 (000) | 94,7% | 97,2% | 116 | 98 |
-| 1 (001) | 92,0% | 95,9% | 188 | 131 |
-| 2 (010) | 90,3% | 95,5% | 236 | 153 |
-| 3 (011) | 88,0% | 95,0% | 265 | 213 |
-| 4 (100) | 92,6% | 96,2% | 211 | 86 |
-| 5 (101) | 90,8% | 95,6% | 254 | 115 |
-| 6 (110) | 88,9% | 95,7% | 302 | 140 |
-| 7 (111) | 86,5% | 94,0% | 357 | 185 |
-| **Średnio** | **90,5%** | 95,6% | | |
+| 0 (000) | 94.7% | 97.2% | 116 | 98 |
+| 1 (001) | 92.0% | 95.9% | 188 | 131 |
+| 2 (010) | 90.3% | 95.5% | 236 | 153 |
+| 3 (011) | 88.0% | 95.0% | 265 | 213 |
+| 4 (100) | 92.6% | 96.2% | 211 | 86 |
+| 5 (101) | 90.8% | 95.6% | 254 | 115 |
+| 6 (110) | 88.9% | 95.7% | 302 | 140 |
+| 7 (111) | 86.5% | 94.0% | 357 | 185 |
+| **Average** | **90.5%** | 95.6% | | |
 
-Dwie ostatnie kolumny to liczba przebiegów na 4000, w których odczyt różnił
-się od K na jednym bicie albo na więcej niż jednym.
+The last two columns are the number of runs out of 4000 in which the read
+differed from K in one bit or in more than one bit.
 
-Co z tego wynika:
+What this shows:
 
-- **QFT odwrotna odczytuje liczbę z faz w 90,5% przebiegów.** Zgadując jedną
-  z ośmiu liczb, trafiałoby się w 12,5%. Każdy z ośmiu obwodów daje
-  poprawną liczbę wielokrotnie częściej niż jakąkolwiek inną.
-- **Im więcej jedynek w K, tym gorzej.** Średnio 94,7% dla liczby bez
-  jedynek, 91,6% dla liczb z jedną, 89,2% z dwiema i 86,5% z trzema, czyli
-  mniej więcej 2,7 punktu na każdą jedynkę. Przy K = 7 każdy błąd jednego
-  bitu to zamiana 1 na 0 (357 przypadków), a przy K = 0 zamiana 0 na 1 (116).
-  Kubit w stanie |1> częściej spada do |0> podczas pomiaru niż odwrotnie, bo
-  stan |1> ma wyższą energię i rozpada się z czasem T1.
-- **Sprzęt wypadł o około 5 punktów gorzej od modelu Fez.** To największa
-  różnica ze wszystkich obwodów. Obwody QFT mają najwięcej bramek
-  dwukubitowych (9) i są najgłębsze, więc różnica między starą kalibracją
-  w modelu a dzisiejszym stanem procesora kumuluje się najbardziej.
+- **The inverse QFT reads the number from the phases in 90.5% of runs.**
+  Guessing one of eight numbers would be right 12.5% of the time. Each of the
+  eight circuits gives the right number many times more often than any other.
+- **The more ones in K, the worse.** On average 94.7% for the number with no
+  ones, 91.6% for numbers with one, 89.2% with two and 86.5% with three,
+  roughly 2.7 points per one. For K = 7 every one-bit error is a 1 turning
+  into 0 (357 cases), and for K = 0 a 0 turning into 1 (116). A qubit in
+  state |1> drops to |0> during measurement more often than the other way
+  round, because |1> has higher energy and decays with time T1.
+- **The hardware did about 5 points worse than the Fez model.** That is the
+  largest gap of all the circuits. The QFT circuits have the most two-qubit
+  gates (9) and are the deepest, so the difference between the old
+  calibration in the model and the processor's state today adds up the most.
 
-## Konto i limity
+## Account and limits
 
-Darmowy plan IBM Quantum daje ograniczony czas na prawdziwych procesorach
-w każdym miesiącu, w planie Open 10 minut. Ten zestaw zużywa go niewiele:
-wszystkie 23 obwody po 4000 powtórzeń zajęły razem 28 sekund (5 sekund
-teleportacja, po 6 kodowanie supergęste i CHSH, 11 QFT). Liczbę powtórzeń
-zmienia flaga `--strzaly`, a flaga `--zestaw` pozwala wysłać tylko jedną
-grupę obwodów.
+The free IBM Quantum plan gives a limited amount of time on real processors
+each month, 10 minutes on the Open plan. This set uses little of it: all 19
+circuits at 4000 runs each took 28 seconds together (5 seconds for
+teleportation, 6 each for superdense coding and CHSH, 11 for the QFT). The
+`--shots` flag sets the number of runs, and `--set` submits just one group of
+circuits.

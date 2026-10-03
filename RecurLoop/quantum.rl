@@ -1,14 +1,14 @@
 // =============================================================================
-// Quantum: biblioteka do symulacji obwodów kwantowych w RecurLoop
+// Quantum: a quantum circuit simulator library for RecurLoop
 //
-// Silnik przechowuje wektor stanu (2^n amplitud zespolonych) i aplikuje bramki
-// w miejscu, zmieniając tylko pary amplitud, których dotyczy bramka. Nie buduje
-// pełnych macierzy 2^n x 2^n jak iloczyn Kroneckera.
+// The engine stores the state vector (2^n complex amplitudes) and applies
+// gates in place, touching only the amplitude pairs a gate acts on. It never
+// builds full 2^n x 2^n matrices with Kronecker products.
 //
-// Kubit o indeksie k odpowiada bitowi k indeksu amplitudy. Nowe kubity
-// dokładane są w stanie |0> jako kolejne, wyższe bity.
+// Qubit k corresponds to bit k of the amplitude index. New qubits are added
+// in state |0> as the next, higher bits.
 //
-// Użycie:
+// Usage:
 //   include "quantum.rl"
 //
 //   circuit bell {
@@ -16,14 +16,14 @@
 //       qubit b
 //       H a
 //       CNOT a, b
-//       measure a -> wynik
+//       measure a -> result
 //       show state
-//       return wynik
+//       return result
 //   }
 //
 //   bell()
 //
-// Pełny opis składni jest w README.md.
+// The full syntax reference is in README.md.
 // =============================================================================
 
 link shared "c"
@@ -48,7 +48,7 @@ extern _exit(code:i64) -> void abi sysv-amd64
 
 let Quantum = phrase { dictionary = true }
 
-// Maksymalna liczba kubitów: 2^24 amplitud to 256 MB pamięci.
+// Maximum number of qubits: 2^24 amplitudes take 256 MB of memory.
 let Quantum:MAX_QUBITS = fn () -> i64 { return 24 }
 let Quantum:PI = fn () -> f64 { return 3.14159265358979323846 }
 
@@ -66,8 +66,8 @@ record Quantum:State {
 }
 
 // -----------------------------------------------------------------------------
-// Pomocnicze operacje na bitach. Język nie ma jeszcze operatorów bitowych,
-// więc bit k liczby x to x / 2^k % 2.
+// Bit helpers. The language has no bitwise operators yet, so bit k of x is
+// x / 2^k % 2.
 // -----------------------------------------------------------------------------
 
 let Quantum:pow2 = fn (k:i64) -> i64 {
@@ -82,7 +82,7 @@ let Quantum:pow2 = fn (k:i64) -> i64 {
 
 let Quantum:check_qubit = fn (s:Quantum:State*, q:i64) -> i64 {
     if q < 0 || q >= s.n {
-        printf("quantum: kubit %lld nie istnieje (rejestr ma %lld kubitów)\n", q, s.n)
+        printf("quantum: qubit %lld does not exist (the register has %lld qubits)\n", q, s.n)
         return 0
     }
     return 1
@@ -94,7 +94,7 @@ let Quantum:name = fn (handle:i64, t:i64) -> u8* {
 }
 
 // -----------------------------------------------------------------------------
-// Rejestr
+// Register
 // -----------------------------------------------------------------------------
 
 let Quantum:new = fn () -> i64 {
@@ -110,7 +110,7 @@ let Quantum:new = fn () -> i64 {
     s.theta = cast(f64*, malloc(cast(u64, limit * 8)))
     s.phi = cast(f64*, malloc(cast(u64, limit * 8)))
     s.prepared = cast(i64*, malloc(cast(u64, limit * 8)))
-    // indices[k] = k. Rejestr kubitów to wskaźnik w środek tej tablicy.
+    // indices[k] = k. A qubit register is a pointer into this array.
     s.indices = cast(i64*, malloc(cast(u64, limit * 8)))
     s.sizes = cast(i64*, malloc(cast(u64, limit * 8)))
     var k = 0
@@ -141,11 +141,11 @@ let Quantum:release = fn (handle:i64) -> i64 {
     return 0
 }
 
-// Dokłada nowy kubit w stanie |0>. Zwraca jego indeks.
+// Adds a new qubit in state |0>. Returns its index.
 let Quantum:alloc = fn (handle:i64, name:u8*) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     if s.n >= Quantum:MAX_QUBITS() {
-        printf("quantum: przekroczono limit %lld kubitów\n", Quantum:MAX_QUBITS())
+        printf("quantum: limit of %lld qubits exceeded\n", Quantum:MAX_QUBITS())
         return 0 - 1
     }
     var old_size = s.size
@@ -168,8 +168,8 @@ let Quantum:alloc = fn (handle:i64, name:u8*) -> i64 {
     return index
 }
 
-// Rejestr count kubitów o nazwach name[0], name[1], ... Zwraca wskaźnik do
-// tablicy ich indeksów, więc w obwodzie r[k] to indeks k-tego kubitu rejestru.
+// A register of count qubits named name[0], name[1], ... Returns a pointer to
+// their indices, so in a circuit r[k] is the index of the register's k-th qubit.
 let Quantum:alloc_reg = fn (handle:i64, name:u8*, count:i64) -> i64* {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     var first = s.n
@@ -186,8 +186,8 @@ let Quantum:alloc_reg = fn (handle:i64, name:u8*, count:i64) -> i64* {
 }
 
 // -----------------------------------------------------------------------------
-// Ogólna bramka jednokubitowa U = [[a, b], [c, d]] z maksymalnie dwoma
-// kubitami kontrolnymi (wartość -1 oznacza brak kontroli).
+// General single-qubit gate U = [[a, b], [c, d]] with up to two control
+// qubits (-1 means no control).
 // -----------------------------------------------------------------------------
 
 let Quantum:apply = fn (handle:i64, c1:i64, c2:i64, t:i64,
@@ -229,7 +229,7 @@ let Quantum:apply = fn (handle:i64, c1:i64, c2:i64, t:i64,
 }
 
 // -----------------------------------------------------------------------------
-// Bramki
+// Gates
 // -----------------------------------------------------------------------------
 
 let Quantum:h = fn (handle:i64, t:i64) -> i64 {
@@ -249,7 +249,7 @@ let Quantum:z = fn (handle:i64, c1:i64, t:i64) -> i64 {
     return Quantum:apply(handle, c1, 0 - 1, t, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 - 1.0, 0.0)
 }
 
-// Bramka fazowa P(phi) = diag(1, e^(i*phi)). S = P(pi/2), T = P(pi/4).
+// Phase gate P(phi) = diag(1, e^(i*phi)). S = P(pi/2), T = P(pi/4).
 let Quantum:phase = fn (handle:i64, c1:i64, t:i64, angle:f64) -> i64 {
     return Quantum:apply(handle, c1, 0 - 1, t, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, cos(angle), sin(angle))
 }
@@ -279,8 +279,8 @@ let Quantum:swap = fn (handle:i64, a:i64, b:i64) -> i64 {
     return 0
 }
 
-// Bariera nie zmienia stanu. Ma znaczenie tylko na sprzęcie, gdzie zabrania
-// kompilatorowi upraszczać obwód ponad nią (zob. qasm.rl).
+// A barrier does not change the state. It only matters on hardware, where it
+// stops the compiler from simplifying the circuit across it (see qasm.rl).
 let Quantum:fence = fn (handle:i64, a:i64, b:i64) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     Quantum:check_qubit(s, a)
@@ -289,7 +289,7 @@ let Quantum:fence = fn (handle:i64, a:i64, b:i64) -> i64 {
 }
 
 // -----------------------------------------------------------------------------
-// Pomiar i przygotowanie stanów
+// Measurement and state preparation
 // -----------------------------------------------------------------------------
 
 let Quantum:set_seed = fn (value:i64) -> i64 {
@@ -302,7 +302,7 @@ let Quantum:clock_seed = fn () -> i64 {
     return 0
 }
 
-// Prawdopodobieństwo, że kubit t da wynik 1.
+// Probability that qubit t measures 1.
 let Quantum:prob_one = fn (handle:i64, t:i64) -> f64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     var m = Quantum:pow2(t)
@@ -317,8 +317,8 @@ let Quantum:prob_one = fn (handle:i64, t:i64) -> f64 {
     return p
 }
 
-// Pomiar w bazie obliczeniowej: losuje wynik zgodnie z regułą Borna
-// i redukuje stan do gałęzi zgodnej z wynikiem.
+// Measurement in the computational basis: draws the outcome by the Born rule
+// and collapses the state to the matching branch.
 let Quantum:do_measure = fn (handle:i64, t:i64) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     if Quantum:check_qubit(s, t) == 0 { return 0 - 1 }
@@ -343,8 +343,9 @@ let Quantum:do_measure = fn (handle:i64, t:i64) -> i64 {
     return outcome
 }
 
-// Pomiar całego rejestru. Kubit r[k] daje bit k wyniku, czyli wynik to
-// liczba zapisana w rejestrze, z r[0] jako najmniej znaczącym bitem.
+// Measures a whole register. Qubit r[k] gives bit k of the result, so the
+// result is the number held in the register, with r[0] as the least
+// significant bit.
 let Quantum:read_reg = fn (handle:i64, r:i64*) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     var count = s.sizes[r[0]]
@@ -364,9 +365,9 @@ let Quantum:do_reset = fn (handle:i64, t:i64) -> i64 {
     return 0
 }
 
-// Przygotowuje kubit (w stanie |0>) w stanie
+// Prepares a qubit (in state |0>) in the state
 //   cos(theta/2)|0> + e^(i*phi) sin(theta/2)|1>
-// i zapamiętuje kąty, żeby można było potem sprawdzić wierność stanu.
+// and remembers the angles so the state's fidelity can be checked later.
 let Quantum:init_state = fn (handle:i64, t:i64, theta:f64, phi:f64) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     if Quantum:check_qubit(s, t) == 0 { return 0 }
@@ -378,23 +379,23 @@ let Quantum:init_state = fn (handle:i64, t:i64, theta:f64, phi:f64) -> i64 {
     return 0
 }
 
-// Losowy stan z rozkładu jednostajnego na sferze Blocha.
+// Random state, uniformly distributed on the Bloch sphere.
 let Quantum:init_random = fn (handle:i64, t:i64) -> i64 {
     var theta = acos(1.0 - 2.0 * drand48())
     var phi = 2.0 * Quantum:PI() * drand48()
     return Quantum:init_state(handle, t, theta, phi)
 }
 
-// Wierność kubitu t względem stanu, w jakim przygotowano kubit ref:
+// Fidelity of qubit t with respect to the state qubit ref was prepared in:
 //   F = <psi| rho_t |psi>
-// Liczona przez odwrócenie przygotowania na kubicie t i odczyt P(0).
-// Stan rejestru jest potem przywracany.
+// Computed by undoing the preparation on qubit t and reading P(0).
+// The register state is restored afterwards.
 let Quantum:get_fidelity = fn (handle:i64, t:i64, ref:i64) -> f64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
     if Quantum:check_qubit(s, t) == 0 { return 0.0 }
     if Quantum:check_qubit(s, ref) == 0 { return 0.0 }
     if s.prepared[ref] == 0 {
-        printf("quantum: kubit %s nie był przygotowany przez prepare\n", s.names[ref])
+        printf("quantum: qubit %s was not set up with prepare\n", s.names[ref])
         return 0.0
     }
     var theta = s.theta[ref]
@@ -407,22 +408,22 @@ let Quantum:get_fidelity = fn (handle:i64, t:i64, ref:i64) -> f64 {
     return f
 }
 
-// Zwraca 1, jeśli wierność różni się od 1 o mniej niż 1e-9.
+// Returns 1 if the fidelity differs from 1 by less than 1e-9.
 let Quantum:same = fn (handle:i64, t:i64, ref:i64) -> i64 {
     var f = Quantum:get_fidelity(handle, t, ref)
     if fabs(1.0 - f) < 0.000000001 { return 1 }
-    printf("quantum: wierność %s względem %s wynosi %.12f\n", Quantum:name(handle, t), Quantum:name(handle, ref), f)
+    printf("quantum: fidelity of %s with respect to %s is %.12f\n", Quantum:name(handle, t), Quantum:name(handle, ref), f)
     return 0
 }
 
 // -----------------------------------------------------------------------------
-// Wyświetlanie
+// Display
 // -----------------------------------------------------------------------------
 
-// Wypisuje niezerowe amplitudy. Kubity w kolejności deklaracji od lewej.
+// Prints the nonzero amplitudes. Qubits appear in declaration order from the left.
 let Quantum:print_state = fn (handle:i64) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
-    printf("  stan |")
+    printf("  state |")
     var k = 0
     while k < s.n {
         if k > 0 { printf(" ") }
@@ -447,7 +448,7 @@ let Quantum:print_state = fn (handle:i64) -> i64 {
     return 0
 }
 
-// Wektor Blocha kubitu t z macierzy gęstości zredukowanej:
+// Bloch vector of qubit t from the reduced density matrix:
 //   x = 2 Re(rho01), y = -2 Im(rho01), z = rho00 - rho11
 let Quantum:print_bloch = fn (handle:i64, t:i64) -> i64 {
     var s:Quantum:State* = cast(Quantum:State*, handle)
@@ -477,22 +478,22 @@ let Quantum:print_bloch = fn (handle:i64, t:i64) -> i64 {
 }
 
 // -----------------------------------------------------------------------------
-// Sprawdzenia w obwodach
+// Checks inside circuits
 // -----------------------------------------------------------------------------
 
 let Quantum:fail = fn (circuit:u8*, text:u8*) -> i64 {
-    printf("quantum: obwód %s: niespełnione sprawdzenie: %s\n", circuit, text)
+    printf("quantum: circuit %s: check failed: %s\n", circuit, text)
     fflush(cast(u8*, 0))
     _exit(1)
     return 0
 }
 
-// Funkcje dostępne w treści obwodów.
+// Functions available inside circuits.
 fn pi() -> f64 {
     return 3.14159265358979323846
 }
 
-// Porównanie liczb rzeczywistych z tolerancją 1e-9.
+// Compares real numbers with a tolerance of 1e-9.
 fn approx(a:f64, b:f64) -> i64 {
     if fabs(a - b) < 0.000000001 { return 1 }
     return 0
@@ -502,14 +503,14 @@ let quantum_seed = <Quantum:set_seed>
 let quantum_seed_from_clock = <Quantum:clock_seed>
 
 // -----------------------------------------------------------------------------
-// Składnia języka obwodów
+// Circuit language syntax
 //
-// `circuit nazwa { ... }` definiuje funkcję natywną `nazwa() -> i64`.
-// Każde wywołanie tworzy nowy rejestr `qs` i zwalnia go na końcu.
-// Obwód może zwrócić wynik instrukcją `return`, domyślnie zwraca 0.
+// `circuit name { ... }` defines a native function `name() -> i64`.
+// Every call creates a new register `qs` and frees it at the end.
+// A circuit can return a result with `return`; by default it returns 0.
 //
-// Treść bloku jest wstawiana jako ciało `if 1 == 1 { ... }`, bo zagnieżdżony
-// blok `{ ... }` w funkcji jest obecnie pomijany przez kompilator RecurLoop.
+// The block body is inserted as the body of `if 1 == 1 { ... }`, because the
+// RecurLoop compiler currently skips a nested `{ ... }` block inside a function.
 // -----------------------------------------------------------------------------
 
 syntax circuit <name:id> <body:block> => fn ${name}() -> i64 {
@@ -520,7 +521,7 @@ syntax circuit <name:id> <body:block> => fn ${name}() -> i64 {
     return 0
 }
 
-// Wariant z parametrami: `circuit nazwa(a:i64, kat:f64) { ... }`.
+// Variant with parameters: `circuit name(a:i64, angle:f64) { ... }`.
 syntax extend circuit <name:id> "(" <params:raw> ")" <body:block> => fn ${name}(${params}) -> i64 {
     var qs = Quantum:new()
     var cname:u8* = "${name}"
@@ -531,17 +532,17 @@ syntax extend circuit <name:id> "(" <params:raw> ")" <body:block> => fn ${name}(
 
 syntax say <text:string> => printf("%s\n", ${text})
 
-// `experiment nazwa { ... }` definiuje funkcję natywną bez rejestru, na przykład
-// do wielokrotnego uruchamiania obwodów i zbierania statystyk. Pętle warto
-// pisać właśnie tutaj: pętla `while` na poziomie skryptu jest w RecurLoop
-// wielokrotnie wolniejsza od natywnej.
+// `experiment name { ... }` defines a native function without a register, for
+// example to run circuits many times and collect statistics. Loops belong
+// here: a script-level `while` loop in RecurLoop is many times slower than a
+// native one.
 syntax experiment <name:id> <body:block> => fn ${name}() -> i64 {
     var cname:u8* = "${name}"
     if 1 == 1 ${body}
     return 0
 }
 
-// Wariant z parametrami: `experiment nazwa(n:i64) { ... }`.
+// Variant with parameters: `experiment name(n:i64) { ... }`.
 syntax extend experiment <name:id> "(" <params:raw> ")" <body:block> => fn ${name}(${params}) -> i64 {
     var cname:u8* = "${name}"
     if 1 == 1 ${body}
@@ -583,8 +584,8 @@ syntax extend prepare <t:expr> "(" <theta:expr> "," <phi:expr> ")" => Quantum:in
 syntax show "state" => Quantum:print_state(qs)
 syntax extend show bloch <t:expr> => Quantum:print_bloch(qs, ${t})
 
-// Warunek zależny od wyniku pomiaru. W symulatorze działa jak `if`, a w qasm.rl
-// staje się warunkiem wykonywanym na komputerze kwantowym w trakcie obwodu.
+// A condition on a measurement result. In the simulator it acts like `if`; in
+// qasm.rl it becomes a condition evaluated on the quantum computer mid-circuit.
 syntax when <bit:id> <body:block> => if ${bit} == 1 ${body}
 
 syntax check <cond:expr> => if !(${cond}) { Quantum:fail(cname, "${cond}") }

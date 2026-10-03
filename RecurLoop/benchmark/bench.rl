@@ -1,8 +1,8 @@
-// Benchmark biblioteki quantum.rl. Ten sam algorytm co bench.rs i bench.py.
+// Benchmark of the quantum.rl library. The same algorithm as bench.rs and bench.py.
 //
-// Użycie z katalogu benchmark:
+// Usage from the benchmark directory:
 //   recurloop --file bench.rl
-// Parametry testów są ustawione na dole pliku.
+// The test parameters are set at the bottom of the file.
 
 include "../quantum.rl"
 
@@ -23,15 +23,15 @@ fn now_ns() -> i64 {
 
 circuit teleport {
     qubit psi
-    qubit alicja
+    qubit alice
     qubit bob
     prepare psi random
-    H alicja
-    CNOT alicja, bob
-    CNOT psi, alicja
+    H alice
+    CNOT alice, bob
+    CNOT psi, alice
     H psi
     measure psi -> m1
-    measure alicja -> m2
+    measure alice -> m2
     if m2 == 1 {
         X bob
     }
@@ -42,7 +42,7 @@ circuit teleport {
     return m1 * 2 + m2
 }
 
-// Warstwa: H i RY(0.1 + 0.05 q) na każdym kubicie, potem łańcuch CNOT q -> q+1.
+// A layer: H and RY(0.1 + 0.05 q) on every qubit, then a chain of CNOT q -> q+1.
 circuit layers(n:i64, depth:i64) {
     var k = 0
     while k < n {
@@ -73,7 +73,7 @@ circuit layers(n:i64, depth:i64) {
     }
     var last = s.size - 1
     var p0 = Quantum:prob_one(qs, 0)
-    printf("layers q=%lld d=%lld norma=%.12f p0=%.12f amp=(%.12e, %.12e)", n, depth, norm, p0, s.re[last], s.im[last])
+    printf("layers q=%lld d=%lld norm=%.12f p0=%.12f amp=(%.12e, %.12e)", n, depth, norm, p0, s.re[last], s.im[last])
     return 0
 }
 
@@ -93,7 +93,7 @@ experiment bench_teleport(count:i64) {
         i += 1
     }
     var ms = cast(f64, now_ns() - start) / 1000000.0
-    printf("teleport n=%lld wyniki=[%lld, %lld, %lld, %lld] czas_ms=%.1f\n", count, c00, c01, c10, c11, ms)
+    printf("teleport n=%lld counts=[%lld, %lld, %lld, %lld] time_ms=%.1f\n", count, c00, c01, c10, c11, ms)
     return 0
 }
 
@@ -101,7 +101,7 @@ experiment bench_layers(n:i64, depth:i64) {
     var start = now_ns()
     layers(n, depth)
     var ms = cast(f64, now_ns() - start) / 1000000.0
-    printf(" czas_ms=%.1f\n", ms)
+    printf(" time_ms=%.1f\n", ms)
     return 0
 }
 

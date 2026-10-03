@@ -1,38 +1,38 @@
 // =============================================================================
-// Kwantowa transformata Fouriera
+// Quantum Fourier transform
 //
-// Na rejestrze r o n kubitach, z r[0] jako najmniej znaczącym bitem:
-//   QFT |x> = 1/sqrt(N) * suma po y z e^(2 pi i x y / N) |y>,   N = 2^n
+// On a register r of n qubits, with r[0] as the least significant bit:
+//   QFT |x> = 1/sqrt(N) * sum over y of e^(2 pi i x y / N) |y>,   N = 2^n
 //
-// Funkcje używają tylko słów języka obwodów, więc działają z oboma
-// backendami. Dołącz ten plik po quantum.rl albo po qasm.rl.
+// The functions use only circuit-language words, so they work with both
+// backends. Include this file after quantum.rl or after qasm.rl.
 // =============================================================================
 
-// Ustawia rejestr na liczbę x: kubit r[k] dostaje bit k liczby x.
-fn ustaw_liczbe(qs:i64, r:i64*, n:i64, x:i64) -> i64 {
-    var reszta = x
+// Sets the register to the number x: qubit r[k] gets bit k of x.
+fn set_number(qs:i64, r:i64*, n:i64, x:i64) -> i64 {
+    var rest = x
     var k = 0
     while k < n {
-        if reszta % 2 == 1 {
+        if rest % 2 == 1 {
             X r[k]
         }
-        reszta = reszta / 2
+        rest = rest / 2
         k += 1
     }
     return 0
 }
 
-// QFT: od najstarszego kubitu H i obroty fazy sterowane młodszymi kubitami,
-// na końcu odwrócenie kolejności kubitów.
+// QFT: from the most significant qubit down, H followed by phase rotations
+// controlled by the lower qubits, then the qubit order is reversed.
 fn qft(qs:i64, r:i64*, n:i64) -> i64 {
     var j = n - 1
     while j >= 0 {
         H r[j]
-        var kat = pi() / 2.0
+        var angle = pi() / 2.0
         var m = j - 1
         while m >= 0 {
-            CP(kat) r[m], r[j]
-            kat = kat / 2.0
+            CP(angle) r[m], r[j]
+            angle = angle / 2.0
             m -= 1
         }
         j -= 1
@@ -45,8 +45,8 @@ fn qft(qs:i64, r:i64*, n:i64) -> i64 {
     return 0
 }
 
-// QFT odwrotna: te same bramki w odwrotnej kolejności i z przeciwnymi kątami.
-fn qft_odwrotna(qs:i64, r:i64*, n:i64) -> i64 {
+// Inverse QFT: the same gates in reverse order with negated angles.
+fn inverse_qft(qs:i64, r:i64*, n:i64) -> i64 {
     var i = 0
     while i < n / 2 {
         SWAP r[i], r[n - 1 - i]
@@ -54,18 +54,18 @@ fn qft_odwrotna(qs:i64, r:i64*, n:i64) -> i64 {
     }
     var j = 0
     while j < n {
-        // Obrót sterowany przez r[m] ma kąt -pi / 2^(j - m)
-        var kat = pi()
+        // The rotation controlled by r[m] has angle -pi / 2^(j - m)
+        var angle = pi()
         var t = 0
         while t < j {
-            kat = kat / 2.0
+            angle = angle / 2.0
             t += 1
         }
-        kat = 0.0 - kat
+        angle = 0.0 - angle
         var m = 0
         while m < j {
-            CP(kat) r[m], r[j]
-            kat = kat * 2.0
+            CP(angle) r[m], r[j]
+            angle = angle * 2.0
             m += 1
         }
         H r[j]
@@ -74,21 +74,21 @@ fn qft_odwrotna(qs:i64, r:i64*, n:i64) -> i64 {
     return 0
 }
 
-// Przygotowuje QFT |k> bez splątania: każdy kubit osobno dostaje H i fazę.
-// Kubit r[j] ma stan (|0> + e^(2 pi i k / 2^(n - j)) |1>) / sqrt(2).
-// QFT odwrotna zamienia ten stan z powrotem na |k>. Na tym opiera się
-// kwantowa estymacja fazy: liczba zapisana w fazach staje się wynikiem pomiaru.
-fn koduj_fourier(qs:i64, r:i64*, n:i64, k:i64) -> i64 {
+// Prepares QFT |k> without entanglement: each qubit gets its own H and phase.
+// Qubit r[j] is in state (|0> + e^(2 pi i k / 2^(n - j)) |1>) / sqrt(2).
+// The inverse QFT turns this state back into |k>. Quantum phase estimation
+// relies on this: a number stored in phases becomes a measurement result.
+fn fourier_encode(qs:i64, r:i64*, n:i64, k:i64) -> i64 {
     var j = 0
     while j < n {
-        var kat = 2.0 * pi() * cast(f64, k)
+        var angle = 2.0 * pi() * cast(f64, k)
         var t = 0
         while t < n - j {
-            kat = kat / 2.0
+            angle = angle / 2.0
             t += 1
         }
         H r[j]
-        P(kat) r[j]
+        P(angle) r[j]
         j += 1
     }
     return 0

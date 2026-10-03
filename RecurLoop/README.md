@@ -1,19 +1,20 @@
-# Quantum: obwody kwantowe w RecurLoop
+# Quantum: quantum circuits in RecurLoop
 
-Biblioteki [RecurLoop](https://github.com/RecurLoop/RecurLoop), które dodają do
-języka składnię obwodów kwantowych. Bramki, pomiary i bloki `circuit` to nowe
-frazy języka zdefiniowane w samych bibliotekach, bez zmian w kompilatorze.
+[RecurLoop](https://github.com/RecurLoop/RecurLoop) libraries that add
+quantum circuit syntax to the language. Gates, measurements and `circuit`
+blocks are new language phrases defined in the libraries themselves, with no
+changes to the compiler.
 
-Ten sam obwód ma dwa backendy, wybierane przez dołączoną bibliotekę:
+The same circuit has two backends, chosen by the included library:
 
-- **`quantum.rl`** symuluje obwód. Każdy obwód kompiluje się do natywnej
-  funkcji liczącej wektor stanu.
-- **`qasm.rl`** kompiluje obwód do OpenQASM 3, który można uruchomić na
-  komputerze kwantowym IBM. Instrukcja jest w [`ibm/README.md`](ibm/README.md).
+- **`quantum.rl`** simulates the circuit. Every circuit compiles to a native
+  function that computes the state vector.
+- **`qasm.rl`** compiles the circuit to OpenQASM 3, which can run on an IBM
+  quantum computer. The guide is in [`ibm/README.md`](ibm/README.md).
 
-Napisane w tym języku teleportacja, kodowanie supergęste, gra CHSH i QFT
-zadziałały na prawdziwych procesorach IBM. Wyniki są w
-[`ibm/README.md`](ibm/README.md#wyniki-na-prawdziwym-sprzęcie).
+Teleportation, superdense coding, the CHSH game and the QFT written in this
+language have run on real IBM processors. The results are in
+[`ibm/README.md`](ibm/README.md#results-on-real-hardware).
 
 ```rl
 include "quantum.rl"
@@ -32,132 +33,132 @@ circuit bell(verbose:i64) {
 bell(0)
 ```
 
-## Uruchomienie
+## Running
 
-Potrzebny jest zbudowany RecurLoop dla Linuksa x86-64:
+You need RecurLoop built for Linux x86-64:
 
 ```bash
 git clone https://github.com/RecurLoop/RecurLoop.git
 cd RecurLoop && make
 ```
 
-Testy i wszystkie przykłady:
+Tests and all examples:
 
 ```bash
-./uruchom.sh /sciezka/do/RecurLoop/build/Release/bin/recurloop
+./run.sh /path/to/RecurLoop/build/Release/bin/recurloop
 ```
 
-Pojedynczy przykład:
+A single example:
 
 ```bash
-recurloop --file przyklady/teleportacja.rl
+recurloop --file examples/teleportation.rl
 ```
 
-## Pliki
+## Files
 
-| Plik | Zawartość |
+| File | Contents |
 |---|---|
-| `quantum.rl` | Silnik symulatora i składnia języka obwodów |
-| `qasm.rl` | Kompilator tych samych obwodów do OpenQASM 3 |
-| `qft.rl` | Kwantowa transformata Fouriera i jej odwrotność, dla obu backendów |
-| `ibm/` | Wszystkie protokoły na prawdziwym komputerze kwantowym IBM |
-| `testy.rl` | Testy wszystkich bramek, pomiaru i wierności |
-| `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
-| `przyklady/chsh.rl` | Gra CHSH ze splątaniem i bez, wartość S i klasyczna granica |
-| `przyklady/qft.rl` | QFT liczby, wykrywanie okresu i odczyt liczby zapisanej w fazach |
-| `przyklady/superdense.rl` | Kodowanie supergęste: cztery wiadomości krok po kroku i 10 000 przebiegów |
-| `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
-| `uruchom.sh` | Uruchamia testy i przykłady |
-| `benchmark/` | Ten sam symulator w Pythonie, NumPy i Rust oraz porównanie wydajności, wyniki w `benchmark/README.md` |
+| `quantum.rl` | The simulator engine and the circuit language syntax |
+| `qasm.rl` | A compiler of the same circuits to OpenQASM 3 |
+| `qft.rl` | The quantum Fourier transform and its inverse, for both backends |
+| `ibm/` | All protocols on a real IBM quantum computer |
+| `tests.rl` | Tests of every gate, measurement and fidelity |
+| `examples/bell.rl` | Bell state and measurement statistics |
+| `examples/chsh.rl` | The CHSH game with and without entanglement, the S value and the classical bound |
+| `examples/qft.rl` | QFT of a number, period finding and reading a number stored in phases |
+| `examples/superdense.rl` | Superdense coding: four messages step by step and 10,000 runs |
+| `examples/teleportation.rl` | The full teleportation protocol step by step and 10,000 random runs |
+| `run.sh` | Runs the tests and examples |
+| `benchmark/` | The same simulator in Python, NumPy and Rust plus a performance comparison, results in `benchmark/README.md` |
 
-## Język obwodów
+## The circuit language
 
-### Definicje
+### Definitions
 
-| Składnia | Znaczenie |
+| Syntax | Meaning |
 |---|---|
-| `circuit nazwa { ... }` | Obwód jako funkcja natywna `nazwa() -> i64` z własnym rejestrem |
-| `circuit nazwa(a:i64, kat:f64) { ... }` | Obwód z parametrami |
-| `experiment nazwa { ... }` | Funkcja natywna bez rejestru, na przykład do statystyk |
-| `experiment nazwa(n:i64) { ... }` | To samo z parametrami |
-| `qubit nazwa` | Nowy kubit w stanie \|0> |
-| `qubits r[n]` | Rejestr n kubitów, kolejne kubity to `r[0]`, `r[1]`, ... W QASM `qubit[n] r;` |
-| `seed 42` | Stałe ziarno losowości, domyślnie ziarno z zegara |
+| `circuit name { ... }` | A circuit as a native function `name() -> i64` with its own register |
+| `circuit name(a:i64, angle:f64) { ... }` | A circuit with parameters |
+| `experiment name { ... }` | A native function without a register, for example for statistics |
+| `experiment name(n:i64) { ... }` | The same with parameters |
+| `qubit name` | A new qubit in state \|0> |
+| `qubits r[n]` | A register of n qubits, `r[0]`, `r[1]`, ... In QASM `qubit[n] r;` |
+| `seed 42` | A fixed random seed; by default the seed comes from the clock |
 
-### Bramki
+### Gates
 
-| Składnia | Bramka |
+| Syntax | Gate |
 |---|---|
-| `H q`, `X q`, `Y q`, `Z q` | Hadamard i bramki Pauliego |
-| `S q`, `T q` | Fazy pi/2 i pi/4 |
-| `P(kat) q` | Faza diag(1, e^(i kat)) |
-| `RX(kat) q`, `RY(kat) q`, `RZ(kat) q` | Obroty wokół osi sfery Blocha |
-| `CNOT c, t`, `CZ c, t` | Bramki kontrolowane |
-| `CP(kat) c, t` | Kontrolowana faza: e^(i kat), gdy oba kubity są w stanie 1 |
-| `SWAP a, b` | Zamiana kubitów |
-| `TOFFOLI c1, c2, t` | Podwójnie kontrolowane NOT |
-| `barrier a, b` | Bez działania w symulacji. Na sprzęcie zabrania kompilatorowi upraszczać obwód ponad tym miejscem |
+| `H q`, `X q`, `Y q`, `Z q` | Hadamard and Pauli gates |
+| `S q`, `T q` | Phases pi/2 and pi/4 |
+| `P(angle) q` | Phase diag(1, e^(i angle)) |
+| `RX(angle) q`, `RY(angle) q`, `RZ(angle) q` | Rotations about the Bloch sphere axes |
+| `CNOT c, t`, `CZ c, t` | Controlled gates |
+| `CP(angle) c, t` | Controlled phase: e^(i angle) when both qubits are 1 |
+| `SWAP a, b` | Qubit swap |
+| `TOFFOLI c1, c2, t` | Doubly controlled NOT |
+| `barrier a, b` | No effect in simulation. On hardware it stops the compiler from simplifying the circuit across this point |
 
-### Pomiar i przygotowanie
+### Measurement and preparation
 
-| Składnia | Znaczenie |
+| Syntax | Meaning |
 |---|---|
-| `measure q -> m` | Pomiar z losowaniem według reguły Borna i redukcją stanu |
-| `measure all r -> x` | Pomiar całego rejestru do liczby, `r[0]` to najmłodszy bit |
-| `probability q -> p` | Prawdopodobieństwo wyniku 1 bez pomiaru |
-| `reset q` | Sprowadzenie kubitu do \|0> |
-| `prepare q random` | Losowy stan jednostajnie na sferze Blocha |
-| `prepare q (theta, phi)` | Stan cos(theta/2)\|0> + e^(i phi) sin(theta/2)\|1> |
-| `fidelity q, ref -> f` | Wierność q względem stanu, w jakim przygotowano ref |
+| `measure q -> m` | Measurement with a Born-rule draw and state collapse |
+| `measure all r -> x` | Measures a whole register as a number, `r[0]` is the lowest bit |
+| `probability q -> p` | Probability of outcome 1 without measuring |
+| `reset q` | Brings a qubit back to \|0> |
+| `prepare q random` | A random state, uniform on the Bloch sphere |
+| `prepare q (theta, phi)` | The state cos(theta/2)\|0> + e^(i phi) sin(theta/2)\|1> |
+| `fidelity q, ref -> f` | Fidelity of q with respect to the state ref was prepared in |
 
-### Wyświetlanie i sprawdzenia
+### Display and checks
 
-| Składnia | Znaczenie |
+| Syntax | Meaning |
 |---|---|
-| `show state` | Niezerowe amplitudy, kubity w kolejności deklaracji od lewej |
-| `show bloch q` | Wektor Blocha kubitu z macierzy gęstości zredukowanej |
-| `say "tekst"` | Wypisanie tekstu |
-| `when bit { ... }` | Blok wykonywany, gdy zmierzony bit wynosi 1. W QASM działa na sprzęcie |
-| `check warunek` | Kończy program kodem 1, jeśli warunek jest fałszywy |
-| `expect q == ref` | Sprawdza, że wierność q względem ref wynosi 1 |
+| `show state` | Nonzero amplitudes, qubits in declaration order from the left |
+| `show bloch q` | Bloch vector of a qubit from the reduced density matrix |
+| `say "text"` | Prints text |
+| `when bit { ... }` | A block run when the measured bit is 1. In QASM it runs on the hardware |
+| `check condition` | Exits the program with code 1 if the condition is false |
+| `expect q == ref` | Checks that the fidelity of q with respect to ref is 1 |
 
-W treści obwodu działa zwykły kod RecurLoop: `if`, `while`, `var`, `return`,
-`printf` oraz funkcje `pi()` i `approx(a, b)`.
+Ordinary RecurLoop code works inside a circuit: `if`, `while`, `var`,
+`return`, `printf`, and the functions `pi()` and `approx(a, b)`.
 
-## Jak działa symulator
+## How the simulator works
 
-Rejestr n kubitów to wektor 2^n amplitud zespolonych. Kubit o indeksie k
-odpowiada bitowi k indeksu amplitudy. Bramka jednokubitowa zmienia tylko pary
-amplitud różniące się bitem k, więc nie trzeba budować macierzy 2^n na 2^n
-iloczynem Kroneckera. Kubity kontrolne ograniczają zmianę do par, w których
-bity kontrolne są równe 1.
+A register of n qubits is a vector of 2^n complex amplitudes. Qubit k
+corresponds to bit k of the amplitude index. A single-qubit gate changes only
+the amplitude pairs that differ in bit k, so there is no need to build a
+2^n by 2^n matrix with Kronecker products. Control qubits restrict the change
+to the pairs whose control bits are 1.
 
-Pomiar liczy prawdopodobieństwo wyniku, losuje wynik, zeruje niezgodną gałąź
-i normalizuje resztę. Wierność względem przygotowanego stanu liczona jest
-przez odwrócenie przygotowania na badanym kubicie i odczyt prawdopodobieństwa
-wyniku 0, po czym stan jest przywracany.
+A measurement computes the outcome probability, draws the outcome, zeroes the
+other branch and renormalizes the rest. Fidelity with respect to a prepared
+state is computed by undoing the preparation on the qubit under test and
+reading the probability of outcome 0, after which the state is restored.
 
-## Co poprawia względem starych symulatorów
+## What it fixes compared with the old simulators
 
-| Problem w `Symulator` i `Implementacja` | Tutaj |
+| Problem in the archived simulators | Here |
 |---|---|
-| Bramki jako pełne macierze z iloczynu Kroneckera | Zmiana tylko par amplitud, pamięć 2^n zamiast 4^n |
-| Teleportacja zawsze zakłada wynik pomiaru 01 i korektę X | Losowy pomiar i korekty X oraz Z zależne od wyniku |
-| Brak sprawdzenia, że Bob dostał właściwy stan | `expect bob == psi` po każdej teleportacji |
-| Warunek z `\|\|` w `Qubit::new` jest zawsze prawdziwy | Stany powstają tylko przez unitarne bramki |
-| CHSH zawsze mierzy 01 i obraca kubity o połowę potrzebnego kąta | Prawdziwy pomiar i kąty dające 85,4% wygranych, S = 2,83 |
-| Superdense coding wybiera rzutnik pomiaru na podstawie znanej wiadomości | Bob mierzy oba kubity zwykłym pomiarem i dopiero wtedy poznaje wiadomość |
+| Gates as full Kronecker-product matrices | Only amplitude pairs change, memory 2^n instead of 4^n |
+| Teleportation always assumes measurement result 01 and an X correction | Random measurement with X and Z corrections depending on the result |
+| No check that Bob received the right state | `expect bob == psi` after every teleportation |
+| The `\|\|` condition in `Qubit::new` is always true | States arise only from unitary gates |
+| CHSH always measures 01 and rotates qubits by half the needed angle | A real measurement and angles giving 85.4% wins, S = 2.83 |
+| Superdense coding picks the measurement projector from the known message | Bob measures both qubits normally and only then learns the message |
 
-## Ograniczenia RecurLoop znalezione przy pisaniu biblioteki
+## RecurLoop limitations found while writing the library
 
-RecurLoop jest projektem badawczym. Te rzeczy mają obejścia w bibliotece,
-ale warto je zgłosić autorowi języka:
+RecurLoop is a research project. These all have workarounds in the library,
+but are worth reporting to the language's author:
 
-1. **Brak operatorów bitowych.** `&`, `|`, `^`, `<<`, `>>` nie działają
-   w funkcjach. Bit k liczby x liczony jest jako `x / 2^k % 2`.
-2. **Zagnieżdżony blok w funkcji jest pomijany.** Instrukcje w `{ ... }`
-   wewnątrz `fn` nie wykonują się i nie ma błędu. Dlatego treść obwodu jest
-   wstawiana jako ciało `if 1 == 1 { ... }`.
+1. **No bitwise operators.** `&`, `|`, `^`, `<<`, `>>` do not work in
+   functions. Bit k of x is computed as `x / 2^k % 2`.
+2. **A nested block in a function is skipped.** Statements in `{ ... }`
+   inside an `fn` do not run and no error is reported. That is why the
+   circuit body is inserted as the body of `if 1 == 1 { ... }`.
    ```rl
    fn f() -> i64 {
        var m = 1
@@ -166,29 +167,29 @@ ale warto je zgłosić autorowi języka:
        }
        return m
    }
-   print f()   // wypisuje 1
+   print f()   // prints 1
    ```
-3. **Pętla `while` na poziomie skryptu ma koszt kwadratowy.** Pusta pętla
-   z 1000 obrotów trwa około 3 s, z 4000 obrotów około 24 s. Ta sama pętla
-   w `fn` jest natychmiastowa, stąd `experiment`.
-4. **Wywołania natywne ze skryptu obsługują tylko liczby całkowite.**
-   Nie da się przekazać ani odebrać `f64`, więc kąty podaje się w obwodach.
-5. **Słowo kluczowe `syntax` dopasowuje się wewnątrz nazw kwalifikowanych.**
-   W funkcji `Quantum:measure(...)` jest rozpoznawane jako instrukcja
-   `measure`. Funkcje biblioteki mają więc nazwy niezaczynające się od słów
-   kluczowych.
-6. **Wywołanie `Ns:f(...)` nie działa jako samodzielna instrukcja na poziomie
-   skryptu**, choć działa w wyrażeniu. Obejściem jest alias `let f = <Ns:f>`.
-7. **Przechwycenie `<t:expr>` łapie `}` z tej samej linii.** Zapis
-   `if m == 1 { X bob }` daje błąd, trzeba pisać bramkę w osobnej linii.
-8. **`assert` nie działa w funkcjach**, stąd własne `check`.
-9. **Wzorzec `syntax` nie może być pusty**, więc jest `show state` zamiast
-   samego `show`. To świadoma decyzja w kodzie RecurLoop.
+3. **A script-level `while` loop has quadratic cost.** An empty loop of 1000
+   iterations takes about 3 s, of 4000 iterations about 24 s. The same loop
+   in an `fn` is instant, hence `experiment`.
+4. **Native calls from a script support only integers.** An `f64` can be
+   neither passed nor returned, so angles are given inside circuits.
+5. **A `syntax` keyword matches inside qualified names.** In a function
+   `Quantum:measure(...)` is recognized as the `measure` statement. Library
+   functions therefore have names that do not start with keywords.
+6. **A call `Ns:f(...)` does not work as a standalone script-level
+   statement**, although it works in an expression. The workaround is an
+   alias `let f = <Ns:f>`.
+7. **A `<t:expr>` capture swallows `}` on the same line.** Writing
+   `if m == 1 { X bob }` is an error; the gate has to go on its own line.
+8. **`assert` does not work in functions**, hence the custom `check`.
+9. **A `syntax` pattern cannot be empty**, so it is `show state` rather than
+   a bare `show`. This is a deliberate decision in the RecurLoop code.
 
-## Plany
+## Plans
 
-1. Algorytmy Deutscha-Jozsy i Grovera.
-2. Estymacja fazy i algorytm Shora dla małych liczb, na bazie `qft.rl`.
-3. Bramki na całych rejestrach, na przykład `H all r`.
-4. Eksport bibliotek do obrazów `quantum.rli` i `qasm.rli` ładowanych przez
+1. The Deutsch-Jozsa and Grover algorithms.
+2. Phase estimation and Shor's algorithm for small numbers, built on `qft.rl`.
+3. Gates on whole registers, for example `H all r`.
+4. Exporting the libraries to `quantum.rli` and `qasm.rli` images loaded with
    `--library`.

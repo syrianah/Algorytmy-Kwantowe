@@ -1,98 +1,99 @@
-# Porównanie wydajności: Python, NumPy, Rust i RecurLoop
+# Performance comparison: Python, NumPy, Rust and RecurLoop
 
-Ten sam symulator wektora stanu napisany w czterech technologiach. Wszystkie
-implementacje dają identyczne sumy kontrolne, więc liczą dokładnie to samo.
+The same state-vector simulator written four ways. All implementations
+produce identical checksums, so they compute exactly the same thing.
 
-## Wyniki
+## Results
 
-Czas obliczeń w milisekundach (ms). 1000 ms to 1 sekunda. Mniej znaczy
-szybciej. Każdy test uruchomiono trzy razy i wpisano najlepszy czas.
+Compute time in milliseconds (ms). 1000 ms is 1 second. Lower is faster.
+Each test ran three times and the best time is shown.
 
-| Implementacja | Teleportacja | 16 kubitów | 20 kubitów |
+| Implementation | Teleportation | 16 qubits | 20 qubits |
 |---|---:|---:|---:|
-| Python, czysty | 2 392 ms | 2 386 ms | 64 649 ms |
-| Python, NumPy | 22 118 ms | 184 ms | 1 633 ms |
-| Rust, dzielenie i modulo | 65 ms | 40 ms | 904 ms |
-| Rust, operatory bitowe | 57 ms | 23 ms | 500 ms |
-| **RecurLoop** | **77 ms** | **51 ms** | **1 115 ms** |
+| Python, pure | 2,392 ms | 2,386 ms | 64,649 ms |
+| Python, NumPy | 22,118 ms | 184 ms | 1,633 ms |
+| Rust, division and modulo | 65 ms | 40 ms | 904 ms |
+| Rust, bitwise operators | 57 ms | 23 ms | 500 ms |
+| **RecurLoop** | **77 ms** | **51 ms** | **1,115 ms** |
 
-Teleportacja to 100 000 teleportacji na 3 kubitach. Kolumny 16 i 20
-kubitów to 5 warstw bramek na rejestrze tej wielkości.
+Teleportation is 100,000 teleportations on 3 qubits. The 16 and 20 qubit
+columns are 5 layers of gates on a register of that size.
 
-Ile razy wolniej od najszybszej wersji, czyli Rust z operatorami bitowymi:
+How many times slower than the fastest version, Rust with bitwise operators:
 
-| Implementacja | Teleportacja | 16 kubitów | 20 kubitów |
+| Implementation | Teleportation | 16 qubits | 20 qubits |
 |---|---:|---:|---:|
-| Python, czysty | 42× | 103× | 129× |
-| Python, NumPy | 389× | 8,0× | 3,3× |
-| Rust, dzielenie i modulo | 1,1× | 1,7× | 1,8× |
-| **RecurLoop** | **1,3×** | **2,2×** | **2,2×** |
+| Python, pure | 42× | 103× | 129× |
+| Python, NumPy | 389× | 8.0× | 3.3× |
+| Rust, division and modulo | 1.1× | 1.7× | 1.8× |
+| **RecurLoop** | **1.3×** | **2.2×** | **2.2×** |
 
-Proces RecurLoop trwał łącznie około 3,1 s. Około 1,9 s z tego to start
-i kompilacja programu, a reszta to obliczenia z tabeli. Rust kompiluje się
-wcześniej, osobnym poleceniem `rustc`.
+The RecurLoop process took about 3.1 s in total. About 1.9 s of that is
+startup and compiling the program; the rest is the computation in the table.
+Rust is compiled beforehand with a separate `rustc` command.
 
-## Wnioski
+## Conclusions
 
-- **RecurLoop jest blisko Rust przy tym samym kodzie.** Jest tylko o 18 do 27%
-  wolniejszy od Rust z tym samym obejściem przez dzielenie i modulo. Oba
-  generują kod maszynowy przez LLVM.
-- **Brak operatorów bitowych kosztuje prawie połowę wydajności.** W warstwach
-  Rust z operatorami bitowymi jest 1,7 do 1,8 raza szybszy od wersji
-  z dzieleniem.
-  Po dodaniu `&` i `>>` do RecurLoop symulator powinien zbliżyć się do Rust.
-- **Czysty Python jest 30 do 60 razy wolniejszy od RecurLoop.** Przy 20
-  kubitach to ponad minuta wobec nieco ponad sekundy.
-- **NumPy nie pomaga przy wielu małych operacjach.** W teleportacji, gdzie
-  stan ma tylko 8 amplitud, narzut wywołań NumPy sprawia, że jest 9 razy
-  wolniejszy od czystego Pythona i 290 razy wolniejszy od RecurLoop. Przy
-  20 kubitach NumPy jest za to tylko 1,5 raza wolniejszy od RecurLoop.
+- **RecurLoop is close to Rust on the same code.** It is only 18 to 27%
+  slower than Rust using the same division-and-modulo workaround. Both
+  generate machine code through LLVM.
+- **The lack of bitwise operators costs almost half the performance.** On
+  the layers, Rust with bitwise operators is 1.7 to 1.8 times faster than the
+  division version. Once `&` and `>>` are added to RecurLoop, the simulator
+  should get close to Rust.
+- **Pure Python is 30 to 60 times slower than RecurLoop.** At 20 qubits it
+  takes over a minute versus just over a second.
+- **NumPy does not help with many small operations.** In teleportation,
+  where the state has only 8 amplitudes, the overhead of NumPy calls makes it
+  9 times slower than pure Python and 290 times slower than RecurLoop. At 20
+  qubits, on the other hand, NumPy is only 1.5 times slower than RecurLoop.
 
-## Co jest mierzone
+## What is measured
 
-**Teleportacja ×100 000.** Pełny protokół na 3 kubitach: losowy stan,
-para splątana, pomiar Alicji, korekty Boba i sprawdzenie wierności. Dużo
-małych operacji, więc liczy się narzut wywołań.
+**Teleportation ×100,000.** The full protocol on 3 qubits: a random state,
+an entangled pair, Alice's measurement, Bob's corrections and a fidelity
+check. Many small operations, so call overhead dominates.
 
-**Warstwy.** Rejestr 16 lub 20 kubitów i 5 warstw. Każda warstwa to bramki
-H i RY na każdym kubicie, a potem łańcuch CNOT między sąsiadami. Przy 20
-kubitach to milion amplitud, więc liczy się szybkość pętli po pamięci.
+**Layers.** A register of 16 or 20 qubits and 5 layers. Each layer is H and
+RY gates on every qubit followed by a chain of CNOTs between neighbours. At
+20 qubits that is a million amplitudes, so the speed of loops over memory
+dominates.
 
-**Algorytm.** Wszystkie wersje poza NumPy przechodzą po wszystkich indeksach
-amplitud, sprawdzają bity kubitu docelowego i kontrolnych, a potem zmieniają
-parę amplitud. Wersja NumPy trzyma stan jako tensor 2×2×…×2 i aplikuje bramkę
-przez `tensordot` po osi kubitu.
+**Algorithm.** Every version except NumPy walks over all amplitude indices,
+tests the bits of the target and control qubits, and then updates a pair of
+amplitudes. The NumPy version keeps the state as a 2×2×…×2 tensor and applies
+a gate with a `tensordot` along the qubit's axis.
 
-**Wariant z dzieleniem.** RecurLoop nie ma operatorów bitowych, więc bit k
-liczby i liczony jest jako `i / 2^k % 2`. Rust jest zmierzony w obu
-wariantach, żeby oddzielić koszt tego obejścia od jakości kompilatora.
+**The division variant.** RecurLoop has no bitwise operators, so bit k of i
+is computed as `i / 2^k % 2`. Rust is measured in both variants to separate
+the cost of this workaround from the quality of the compiler.
 
-## Zastrzeżenia
+## Caveats
 
-- Pomiary pochodzą z maszyny wirtualnej, gdzie powtórzenia różnią się
-  o kilkanaście procent. Dlatego tabela podaje najlepszy z trzech czasów.
-- Generatory liczb losowych są różne, więc rozkład wyników teleportacji
-  różni się między językami. Sumy kontrolne warstw nie używają losowości.
-- Wersja NumPy jest typowa, ale nie najszybsza możliwa. Ręcznie
-  zoptymalizowany NumPy, na przykład z indeksowaniem po wycinkach zamiast
-  `tensordot`, byłby szybszy przy dużych rejestrach.
+- The measurements come from a virtual machine, where repeats differ by ten
+  to twenty percent. That is why the table shows the best of three times.
+- The random number generators differ, so the distribution of teleportation
+  results differs between languages. The layer checksums use no randomness.
+- The NumPy version is typical but not the fastest possible. Hand-optimized
+  NumPy, for example with slice indexing instead of `tensordot`, would be
+  faster on large registers.
 
-## Środowisko
+## Environment
 
 | | |
 |---|---|
-| Procesor | Intel Xeon @ 2,10 GHz, 4 rdzenie wirtualne |
-| System | Linux x86-64 |
+| CPU | Intel Xeon @ 2.10 GHz, 4 virtual cores |
+| OS | Linux x86-64 |
 | Python | 3.11.15, NumPy 2.4.6 |
 | Rust | rustc 1.97.0, `-C opt-level=3 -C target-cpu=native` |
-| RecurLoop | commit `5534f94`, kompilacja Release z LLVM 22.1.8 |
+| RecurLoop | commit `5534f94`, Release build with LLVM 22.1.8 |
 
-## Uruchomienie
+## Running
 
 ```bash
 pip install numpy
-./uruchom_benchmark.sh /sciezka/do/RecurLoop/build/Release/bin/recurloop
+./run_benchmark.sh /path/to/RecurLoop/build/Release/bin/recurloop
 ```
 
-Liczbę powtórzeń zmienia zmienna `POWTORZENIA`, domyślnie 3. Całość trwa
-około 5 minut, głównie przez czysty Python przy 20 kubitach.
+The `REPEATS` variable sets the number of repeats, 3 by default. The whole
+run takes about 5 minutes, mostly pure Python at 20 qubits.

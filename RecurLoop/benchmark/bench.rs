@@ -1,12 +1,12 @@
-// Benchmark symulatora wektora stanu w Rust.
-// Ten sam algorytm co quantum.rl: pętla po wszystkich indeksach amplitud
-// i sprawdzanie bitów. Dwa warianty sprawdzania bitów:
-//   div - dzielenie i modulo jak w RecurLoop, który nie ma operatorów bitowych
-//   bit - operatory bitowe & i <<
+// State-vector simulator benchmark in Rust.
+// The same algorithm as quantum.rl: a loop over every amplitude index with bit
+// tests. Two variants of the bit test:
+//   div - division and modulo, as in RecurLoop, which has no bitwise operators
+//   bit - the bitwise operators & and <<
 //
-// Kompilacja:  rustc -C opt-level=3 -C target-cpu=native bench.rs -o bench_rs
-// Użycie:      ./bench_rs (div|bit) teleport N
-//              ./bench_rs (div|bit) layers QUBITS DEPTH
+// Build:  rustc -C opt-level=3 -C target-cpu=native bench.rs -o bench_rs
+// Usage:  ./bench_rs (div|bit) teleport N
+//         ./bench_rs (div|bit) layers QUBITS DEPTH
 
 use std::env;
 use std::time::Instant;
@@ -14,7 +14,7 @@ use std::time::Instant;
 struct Rng(u64);
 
 impl Rng {
-    // xorshift64*, wynik w [0, 1)
+    // xorshift64*, result in [0, 1)
     fn next(&mut self) -> f64 {
         self.0 ^= self.0 >> 12;
         self.0 ^= self.0 << 25;
@@ -34,8 +34,8 @@ struct State {
     bitwise: bool,
 }
 
-// Potęga dwójki liczona pętlą, jak w quantum.rl. Kompilator nie wie wtedy,
-// że dzielnik jest potęgą dwójki, więc wariant div naprawdę dzieli.
+// Power of two computed with a loop, as in quantum.rl. The compiler then does
+// not know the divisor is a power of two, so the div variant really divides.
 #[inline(never)]
 fn pow2(k: i64) -> i64 {
     let mut r = 1i64;
@@ -63,7 +63,7 @@ impl State {
         self.n - 1
     }
 
-    // U = [[a, b], [c, d]], liczby zespolone jako pary (re, im)
+    // U = [[a, b], [c, d]], complex numbers as (re, im) pairs
     fn apply(&mut self, c1: i64, c2: i64, t: i64, u: [f64; 8]) {
         let [ar, ai, br, bi, cr, ci, dr, di] = u;
         let mt = pow2(t);
@@ -180,13 +180,13 @@ fn teleport(bitwise: bool, rng: &mut Rng) -> i64 {
     if m1 == 1 { s.z(bob); }
     let f = s.fidelity(bob, psi);
     if (1.0 - f).abs() >= 1e-9 {
-        panic!("teleportacja nieudana, wierność {}", f);
+        panic!("teleportation failed, fidelity {}", f);
     }
     m1 * 2 + m2
 }
 
-// Warstwa: H i RY(0.1 + 0.05 q) na każdym kubicie, potem łańcuch CNOT q -> q+1.
-// Wynik: norma, P(q0 = 1) i ostatnia amplituda jako suma kontrolna.
+// A layer: H and RY(0.1 + 0.05 q) on every qubit, then a chain of CNOT q -> q+1.
+// Result: the norm, P(q0 = 1) and the last amplitude as a checksum.
 fn layers(bitwise: bool, n: i64, depth: i64) -> (f64, f64, f64, f64) {
     let mut s = State::new(bitwise);
     for _ in 0..n { s.alloc(); }
@@ -213,15 +213,15 @@ fn main() {
             let mut counts = [0i64; 4];
             for _ in 0..n { counts[teleport(bitwise, &mut rng) as usize] += 1; }
             let ms = start.elapsed().as_secs_f64() * 1000.0;
-            println!("teleport n={} wyniki={:?} czas_ms={:.1}", n, counts, ms);
+            println!("teleport n={} counts={:?} time_ms={:.1}", n, counts, ms);
         }
         "layers" => {
             let q: i64 = args[3].parse().unwrap();
             let d: i64 = args[4].parse().unwrap();
             let (norm, p0, ar, ai) = layers(bitwise, q, d);
             let ms = start.elapsed().as_secs_f64() * 1000.0;
-            println!("layers q={} d={} norma={:.12} p0={:.12} amp=({:.12e}, {:.12e}) czas_ms={:.1}", q, d, norm, p0, ar, ai, ms);
+            println!("layers q={} d={} norm={:.12} p0={:.12} amp=({:.12e}, {:.12e}) time_ms={:.1}", q, d, norm, p0, ar, ai, ms);
         }
-        _ => panic!("nieznany test"),
+        _ => panic!("unknown test"),
     }
 }

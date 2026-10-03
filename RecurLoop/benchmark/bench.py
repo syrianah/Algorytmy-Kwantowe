@@ -1,11 +1,11 @@
-"""Benchmark symulatora wektora stanu w Pythonie.
+"""State-vector simulator benchmark in Python.
 
-Dwie implementacje:
-  pure   - ten sam algorytm co quantum.rl i bench.rs, czysty Python
-  numpy  - wektoryzacja NumPy: stan jako tensor (2, 2, ..., 2), bramka
-           jako tensordot po osi kubitu
+Two implementations:
+  pure   - the same algorithm as quantum.rl and bench.rs, in pure Python
+  numpy  - NumPy vectorization: the state as a (2, 2, ..., 2) tensor, a gate
+           as a tensordot along the qubit's axis
 
-Użycie:
+Usage:
   python3 bench.py (pure|numpy) teleport N
   python3 bench.py (pure|numpy) layers QUBITS DEPTH
 """
@@ -17,7 +17,7 @@ import time
 
 
 # ---------------------------------------------------------------------------
-# Czysty Python
+# Pure Python
 # ---------------------------------------------------------------------------
 
 class PureState:
@@ -107,7 +107,7 @@ class NumpyState:
         import numpy as np
         self.np = np
         self.n = 0
-        # Oś k tensora to kubit n-1-k, więc kubit q to bit q indeksu płaskiego
+        # Tensor axis k is qubit n-1-k, so qubit q is bit q of the flat index
         self.psi = np.ones((), dtype=np.complex128)
         self.theta = []
         self.phi = []
@@ -184,7 +184,7 @@ class NumpyState:
 
 
 # ---------------------------------------------------------------------------
-# Wspólne testy
+# Shared tests
 # ---------------------------------------------------------------------------
 
 def prepare_random(s, t, rng):
@@ -224,7 +224,7 @@ def teleport(make, rng):
         s.z(bob)
     f = fidelity(s, bob, psi)
     if abs(1.0 - f) >= 1e-9:
-        raise RuntimeError(f"teleportacja nieudana, wierność {f}")
+        raise RuntimeError(f"teleportation failed, fidelity {f}")
     return m1 * 2 + m2
 
 
@@ -253,12 +253,12 @@ def main():
         for _ in range(n):
             counts[teleport(make, rng)] += 1
         ms = (time.perf_counter() - start) * 1000.0
-        print(f"teleport n={n} wyniki={counts} czas_ms={ms:.1f}")
+        print(f"teleport n={n} counts={counts} time_ms={ms:.1f}")
     else:
         q, d = int(sys.argv[3]), int(sys.argv[4])
         norm, p0, ar, ai = layers(make, q, d)
         ms = (time.perf_counter() - start) * 1000.0
-        print(f"layers q={q} d={d} norma={norm:.12f} p0={p0:.12f} amp=({ar:.12e}, {ai:.12e}) czas_ms={ms:.1f}")
+        print(f"layers q={q} d={d} norm={norm:.12f} p0={p0:.12f} amp=({ar:.12e}, {ai:.12e}) time_ms={ms:.1f}")
 
 
 if __name__ == "__main__":

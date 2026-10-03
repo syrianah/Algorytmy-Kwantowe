@@ -1,13 +1,13 @@
-// Testy bramek i pomiarów biblioteki quantum.rl.
-// Uruchomienie z katalogu RecurLoop:
-//   recurloop --file testy.rl
-// Każdy obwód kończy program kodem 1, jeśli któreś sprawdzenie zawiedzie.
+// Tests of the gates and measurements in the quantum.rl library.
+// Run from the RecurLoop directory:
+//   recurloop --file tests.rl
+// Each circuit exits the program with code 1 if any check fails.
 
 include "quantum.rl"
 
 seed 12345
 
-// X zamienia |0> na |1>
+// X turns |0> into |1>
 circuit test_x {
     qubit q
     X q
@@ -24,7 +24,7 @@ circuit test_hh {
     check approx(p, 0.0) == 1
 }
 
-// H tworzy równą superpozycję
+// H creates an equal superposition
 circuit test_h {
     qubit q
     H q
@@ -42,7 +42,7 @@ circuit test_hzh {
     check approx(p, 1.0) == 1
 }
 
-// S S = Z oraz T^4 = Z, sprawdzane przez H _ H
+// S S = Z and T^4 = Z, checked through H _ H
 circuit test_phase {
     qubit a
     qubit b
@@ -62,7 +62,7 @@ circuit test_phase {
     check approx(pb, 1.0) == 1
 }
 
-// RX(pi) i RY(pi) odwracają |0> na |1>, RZ nie zmienia prawdopodobieństw
+// RX(pi) and RY(pi) flip |0> to |1>, RZ does not change probabilities
 circuit test_rotations {
     qubit a
     qubit b
@@ -78,7 +78,7 @@ circuit test_rotations {
     check approx(pc, 0.0) == 1
 }
 
-// Y Y = I na przygotowanym stanie, Y|0> = i|1>
+// Y Y = I on a prepared state, Y|0> = i|1>
 circuit test_y {
     qubit q
     qubit r
@@ -91,7 +91,7 @@ circuit test_y {
     check approx(p, 1.0) == 1
 }
 
-// Tablica prawdy CNOT
+// CNOT truth table
 circuit test_cnot {
     qubit a
     qubit b
@@ -104,7 +104,7 @@ circuit test_cnot {
     check approx(p1, 1.0) == 1
 }
 
-// SWAP przenosi przygotowany stan na drugi kubit
+// SWAP moves a prepared state to the other qubit
 circuit test_swap {
     qubit a
     qubit b
@@ -115,7 +115,7 @@ circuit test_swap {
     check approx(p, 0.0) == 1
 }
 
-// TOFFOLI działa tylko przy obu kontrolach równych 1
+// TOFFOLI acts only when both controls are 1
 circuit test_toffoli {
     qubit a
     qubit b
@@ -130,7 +130,7 @@ circuit test_toffoli {
     check approx(p1, 1.0) == 1
 }
 
-// H b, CZ, H b działa jak CNOT
+// H b, CZ, H b acts like CNOT
 circuit test_cz {
     qubit a
     qubit b
@@ -142,7 +142,7 @@ circuit test_cz {
     check approx(p, 1.0) == 1
 }
 
-// CP(pi) z kontrolą w stanie 1 działa jak CZ, a z kontrolą 0 nic nie robi
+// CP(pi) with the control in state 1 acts like CZ; with control 0 it does nothing
 circuit test_cp {
     qubit a
     qubit b
@@ -156,7 +156,7 @@ circuit test_cp {
     check approx(p, 1.0) == 1
 }
 
-// Rejestr: kubity r[0], r[1], ... i pomiar całego rejestru do liczby
+// Register: qubits r[0], r[1], ... and measuring the whole register as a number
 circuit test_register {
     qubit a
     qubits r[4]
@@ -170,7 +170,7 @@ circuit test_register {
     check m == 1
 }
 
-// Reset sprowadza kubit do |0>
+// Reset brings a qubit back to |0>
 circuit test_reset {
     qubit q
     H q
@@ -179,7 +179,7 @@ circuit test_reset {
     check approx(p, 0.0) == 1
 }
 
-// Wierność stanów ortogonalnych wynosi 0, a stanu |+> względem |0> 1/2
+// Fidelity of orthogonal states is 0, and of |+> with respect to |0> it is 1/2
 circuit test_fidelity {
     qubit a
     qubit b
@@ -193,7 +193,7 @@ circuit test_fidelity {
     check approx(f1, 0.5) == 1
 }
 
-// `when` wykonuje blok tylko, gdy zmierzony bit wynosi 1
+// `when` runs its block only if the measured bit is 1
 circuit test_when {
     qubit a
     qubit b
@@ -211,7 +211,7 @@ circuit test_when {
     check approx(p, 1.0) == 1
 }
 
-// Stan Bella: wyniki obu pomiarów są zawsze równe. Zwraca wynik pomiaru.
+// Bell state: both measurement results are always equal. Returns the result.
 circuit bell_pair {
     qubit a
     qubit b
@@ -240,7 +240,7 @@ test_reset()
 test_fidelity()
 test_when()
 
-// Przy 1000 próbach wynik 1 powinien wypaść około 500 razy
+// Over 1000 trials the result 1 should come up about 500 times
 experiment bell_statistics {
     var ones = 0
     var trial = 0
@@ -254,4 +254,4 @@ experiment bell_statistics {
 }
 
 const ones = bell_statistics()
-print "Wszystkie testy zaliczone. Para Bella: " + str(ones) + " jedynek na 1000 prób."
+print "All tests passed. Bell pair: " + str(ones) + " ones in 1000 trials."

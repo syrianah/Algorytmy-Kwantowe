@@ -8,7 +8,7 @@ target/
 # macOS
 .DS_Store
 
-# LaTeX: pliki pośrednie kompilacji
+# LaTeX build intermediates
 *.aux
 *.auxlock
 *.fdb_latexmk
