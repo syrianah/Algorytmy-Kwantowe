@@ -256,6 +256,43 @@ Co z tego wynika:
   eksperymenty z odległymi detektorami, ale pokazuje korelacje, których
   nie da się uzyskać z klasycznych bitów.
 
+### Kwantowa transformata Fouriera
+
+Tego samego dnia osiem obwodów QFT uruchomiono na procesorze `ibm_fez`, po
+4000 przebiegów każdego. Zadanie `db05kfc92g1c7399ttag` zajęło 11 sekund
+czasu procesora.
+
+| Zapisana liczba K | Odczytano K | Model Fez | Błąd jednego bitu | Większy błąd |
+|---|---:|---:|---:|---:|
+| 0 (000) | 94,7% | 97,2% | 116 | 98 |
+| 1 (001) | 92,0% | 95,9% | 188 | 131 |
+| 2 (010) | 90,3% | 95,5% | 236 | 153 |
+| 3 (011) | 88,0% | 95,0% | 265 | 213 |
+| 4 (100) | 92,6% | 96,2% | 211 | 86 |
+| 5 (101) | 90,8% | 95,6% | 254 | 115 |
+| 6 (110) | 88,9% | 95,7% | 302 | 140 |
+| 7 (111) | 86,5% | 94,0% | 357 | 185 |
+| **Średnio** | **90,5%** | 95,6% | | |
+
+Dwie ostatnie kolumny to liczba przebiegów na 4000, w których odczyt różnił
+się od K na jednym bicie albo na więcej niż jednym.
+
+Co z tego wynika:
+
+- **QFT odwrotna odczytuje liczbę z faz w 90,5% przebiegów.** Zgadując jedną
+  z ośmiu liczb, trafiałoby się w 12,5%. Każdy z ośmiu obwodów daje
+  poprawną liczbę wielokrotnie częściej niż jakąkolwiek inną.
+- **Im więcej jedynek w K, tym gorzej.** Średnio 94,7% dla liczby bez
+  jedynek, 91,6% dla liczb z jedną, 89,2% z dwiema i 86,5% z trzema, czyli
+  mniej więcej 2,7 punktu na każdą jedynkę. Przy K = 7 każdy błąd jednego
+  bitu to zamiana 1 na 0 (357 przypadków), a przy K = 0 zamiana 0 na 1 (116).
+  Kubit w stanie |1> częściej spada do |0> podczas pomiaru niż odwrotnie, bo
+  stan |1> ma wyższą energię i rozpada się z czasem T1.
+- **Sprzęt wypadł o około 5 punktów gorzej od modelu Fez.** To największa
+  różnica ze wszystkich obwodów. Obwody QFT mają najwięcej bramek
+  dwukubitowych (9) i są najgłębsze, więc różnica między starą kalibracją
+  w modelu a dzisiejszym stanem procesora kumuluje się najbardziej.
+
 ## Konto i limity
 
 Darmowy plan IBM Quantum daje ograniczony czas na prawdziwych procesorach
