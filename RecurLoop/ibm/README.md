@@ -209,6 +209,36 @@ Co z tego wynika:
   każdy z tych obwodów w bramki X przed pomiarem. Wynik byłby wtedy prawie
   idealny, ale bez splątania, więc nie świadczyłby o niczym.
 
+### Gra CHSH
+
+Tego samego dnia cztery obwody gry CHSH uruchomiono na procesorze `ibm_fez`,
+po 4000 przebiegów każdego. Zadanie `db05ba492g1c7399tjb0` zajęło 6 sekund
+czasu procesora.
+
+| Pytania x y | Wygrane na `ibm_fez` | Model Fez | Ideał |
+|---|---:|---:|---:|
+| 00 | 84,3% | 84,8% | 85,4% |
+| 01 | 84,4% | 83,8% | 85,4% |
+| 10 | 83,9% | 84,5% | 85,4% |
+| 11 | 82,6% | 84,7% | 85,4% |
+| **S** | **2,704** | 2,754 | 2,828 |
+
+Co z tego wynika:
+
+- **Nierówność Bella jest złamana.** S = 2,704 ± 0,023, czyli o 0,70 ponad
+  klasyczną granicę 2. To ponad 30 odchyleń standardowych, więc wynik nie
+  jest przypadkiem statystycznym.
+- **Alicja i Bob wygrali średnio 83,8% gier.** Żadna strategia klasyczna
+  nie daje więcej niż 75%, nawet gdy gracze przed grą uzgodnią wspólne
+  losowe bity.
+- **Wynik jest bliski ideału mimo szumu.** Szum obniżył S z 2,828 do 2,704,
+  czyli o około 4%. Obwód ma tylko jedną bramkę dwukubitową.
+- **To samo zastrzeżenie co przy każdym takim teście na jednym chipie.**
+  Kubity Alicji i Boba leżą obok siebie, a pytania są wpisane w obwód przed
+  uruchomieniem. Pomiar nie zamyka więc luki lokalności tak jak
+  eksperymenty z odległymi detektorami, ale pokazuje korelacje, których
+  nie da się uzyskać z klasycznych bitów.
+
 ## Konto i limity
 
 Darmowy plan IBM Quantum daje ograniczony czas na prawdziwych procesorach
