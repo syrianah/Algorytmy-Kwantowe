@@ -18,6 +18,7 @@ Usage, from the ibm directory, after generating the .qasm files:
   python3 run_ibm.py --set superdense --submit   # superdense coding only
   python3 run_ibm.py --set chsh --submit         # CHSH game only
   python3 run_ibm.py --set qft --submit          # Fourier transform only
+  python3 run_ibm.py --set grover --submit       # Grover's search only
   python3 run_ibm.py --job ID                 # fetches the results of an earlier job
                                               # (with the same --set as when submitted)
 """
@@ -29,9 +30,7 @@ from collections import Counter
 from qiskit import transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
 
-from common import CHSH, CIRCUITS, QFT, SUPERDENSE, TELEPORTATION, bob_reads, chsh_s, load, score
-
-SETS = {"all": CIRCUITS, "teleportation": TELEPORTATION, "superdense": SUPERDENSE, "chsh": CHSH, "qft": QFT}
+from common import CHSH, SETS, bob_reads, chsh_s, load, score
 
 
 def main():
@@ -99,9 +98,10 @@ def show_results(result, names, shots):
     if all(n in fractions for n in CHSH):
         print(f"\n  CHSH: S = {chsh_s([fractions[n] for n in CHSH]):.3f}"
               " (classically at most 2, ideally 2.828)")
-    print("\nOn ideal hardware teleportation, superdense coding and the QFT give 100%, the CHSH game 85.4%.")
-    print("A random result is 50% for teleportation, 25% for superdense coding, 50% for CHSH")
-    print("and 12.5% for the QFT.")
+    print("\nOn ideal hardware teleportation, superdense coding, the QFT and Grover on two qubits")
+    print("give 100%, Grover on three qubits 94.5% and the CHSH game 85.4%.")
+    print("A random result is 50% for teleportation, 25% for superdense coding, 50% for CHSH,")
+    print("12.5% for the QFT, and 25% or 12.5% for Grover on two or three qubits.")
 
 
 if __name__ == "__main__":

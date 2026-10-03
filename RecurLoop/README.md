@@ -61,10 +61,12 @@ recurloop --file examples/teleportation.rl
 | `quantum.rl` | The simulator engine and the circuit language syntax |
 | `qasm.rl` | A compiler of the same circuits to OpenQASM 3 |
 | `qft.rl` | The quantum Fourier transform and its inverse, for both backends |
+| `grover.rl` | Grover's search on 2 or 3 qubits: oracle, diffusion and the whole search, for both backends |
 | `ibm/` | All protocols on a real IBM quantum computer |
 | `tests.rl` | Tests of every gate, measurement and fidelity |
 | `examples/bell.rl` | Bell state and measurement statistics |
 | `examples/chsh.rl` | The CHSH game with and without entanglement, the S value and the classical bound |
+| `examples/grover.rl` | Grover's search step by step and the success probability after 0 to 5 iterations |
 | `examples/qft.rl` | QFT of a number, period finding and reading a number stored in phases |
 | `examples/superdense.rl` | Superdense coding: four messages step by step and 10,000 runs |
 | `examples/teleportation.rl` | The full teleportation protocol step by step and 10,000 random runs |
@@ -97,6 +99,7 @@ recurloop --file examples/teleportation.rl
 | `CP(angle) c, t` | Controlled phase: e^(i angle) when both qubits are 1 |
 | `SWAP a, b` | Qubit swap |
 | `TOFFOLI c1, c2, t` | Doubly controlled NOT |
+| `CCZ a, b, c` | Doubly controlled Z: flips the sign when all three qubits are 1 |
 | `barrier a, b` | No effect in simulation. On hardware it stops the compiler from simplifying the circuit across this point |
 
 ### Measurement and preparation
@@ -188,7 +191,7 @@ but are worth reporting to the language's author:
 
 ## Plans
 
-1. The Deutsch-Jozsa and Grover algorithms.
+1. The Deutsch-Jozsa algorithm, and Grover's search on more qubits.
 2. Phase estimation and Shor's algorithm for small numbers, built on `qft.rl`.
 3. Gates on whole registers, for example `H all r`.
 4. Exporting the libraries to `quantum.rli` and `qasm.rli` images loaded with

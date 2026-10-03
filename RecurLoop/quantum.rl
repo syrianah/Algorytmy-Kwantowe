@@ -241,6 +241,11 @@ let Quantum:x = fn (handle:i64, c1:i64, c2:i64, t:i64) -> i64 {
     return Quantum:apply(handle, c1, c2, t, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0)
 }
 
+// Z on t only when both controls are 1: flips the sign of |111> on (a, b, t).
+let Quantum:ccz = fn (handle:i64, a:i64, b:i64, t:i64) -> i64 {
+    return Quantum:apply(handle, a, b, t, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 - 1.0, 0.0)
+}
+
 let Quantum:y = fn (handle:i64, c1:i64, t:i64) -> i64 {
     return Quantum:apply(handle, c1, 0 - 1, t, 0.0, 0.0, 0.0, 0.0 - 1.0, 0.0, 1.0, 0.0, 0.0)
 }
@@ -570,6 +575,7 @@ syntax CZ <c:expr> "," <t:expr> => Quantum:z(qs, ${c}, ${t})
 syntax CP "(" <angle:expr> ")" <c:expr> "," <t:expr> => Quantum:phase(qs, ${c}, ${t}, ${angle})
 syntax SWAP <a:expr> "," <b:expr> => Quantum:swap(qs, ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Quantum:x(qs, ${c1}, ${c2}, ${t})
+syntax CCZ <a:expr> "," <b:expr> "," <t:expr> => Quantum:ccz(qs, ${a}, ${b}, ${t})
 syntax barrier <a:expr> "," <b:expr> => Quantum:fence(qs, ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Quantum:do_measure(qs, ${t})

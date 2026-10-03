@@ -211,6 +211,30 @@ circuit test_when {
     check approx(p, 1.0) == 1
 }
 
+// CCZ flips the sign only when all three qubits are 1, checked through H _ H
+// on the target: c ends in |1>, while f, with one control at 0, stays in |0>
+circuit test_ccz {
+    qubit a
+    qubit b
+    qubit c
+    qubit d
+    qubit e
+    qubit f
+    X a
+    X b
+    H c
+    CCZ a, b, c
+    H c
+    X d
+    H f
+    CCZ d, e, f
+    H f
+    probability c -> pc
+    probability f -> pf
+    check approx(pc, 1.0) == 1
+    check approx(pf, 0.0) == 1
+}
+
 // Bell state: both measurement results are always equal. Returns the result.
 circuit bell_pair {
     qubit a
@@ -234,6 +258,7 @@ test_cnot()
 test_swap()
 test_toffoli()
 test_cz()
+test_ccz()
 test_cp()
 test_register()
 test_reset()

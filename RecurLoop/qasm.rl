@@ -173,6 +173,14 @@ let Qasm:g3 = fn (h:i64, gate:u8*, a:i64, b:i64, c:i64) -> i64 {
     return 0
 }
 
+// CCZ is not in stdgates.inc, so it is written as H, Toffoli, H on the target.
+let Qasm:ccz = fn (h:i64, a:i64, b:i64, c:i64) -> i64 {
+    Qasm:g1(h, "h", c)
+    Qasm:g3(h, "ccx", a, b, c)
+    Qasm:g1(h, "h", c)
+    return 0
+}
+
 let Qasm:do_measure = fn (h:i64, t:i64, bit:u8*) -> i64 {
     Qasm:pad(h)
     fprintf(Qasm:out(h), "bit[1] %s;\n", bit)
@@ -291,6 +299,7 @@ syntax CZ <c:expr> "," <t:expr> => Qasm:g2(qs, "cz", ${c}, ${t})
 syntax CP "(" <angle:expr> ")" <c:expr> "," <t:expr> => Qasm:g2a(qs, "cp", ${angle}, ${c}, ${t})
 syntax SWAP <a:expr> "," <b:expr> => Qasm:g2(qs, "swap", ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Qasm:g3(qs, "ccx", ${c1}, ${c2}, ${t})
+syntax CCZ <a:expr> "," <b:expr> "," <t:expr> => Qasm:ccz(qs, ${a}, ${b}, ${t})
 syntax barrier <a:expr> "," <b:expr> => Qasm:g2(qs, "barrier", ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Qasm:do_measure(qs, ${t}, "${name}")

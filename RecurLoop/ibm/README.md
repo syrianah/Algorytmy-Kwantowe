@@ -41,6 +41,12 @@ included library: `quantum.rl` simulates and `qasm.rl` compiles.
   is stored only in the phases of three qubits, without entanglement. The
   inverse QFT turns the phases into a number, and measuring the `result`
   register should give K. Guessing would be right 12.5% of the time.
+- **`grover2_0` to `grover2_3` and `grover3_0` to `grover3_7`** are Grover's
+  search from the `../grover.rl` library. The oracle hides the number K and
+  only flips the sign of |K>. On two qubits one iteration finds K with
+  certainty; on three qubits two iterations find it 94.5% of the time.
+  Measuring the `found` register should give K. Guessing would be right 25%
+  or 12.5% of the time.
 
 Bob's state cannot be read out directly on hardware. So `expect bob == psi`
 undoes the preparation of psi on Bob's qubit and measures it into the bit
@@ -102,7 +108,8 @@ python3 run_ibm.py --submit
 ```
 
 All circuits are submitted by default. `--set teleportation`,
-`--set superdense`, `--set chsh` or `--set qft` picks just one group.
+`--set superdense`, `--set chsh`, `--set qft` or `--set grover` picks just one
+group. `check_noise.py` takes the same `--set` flag.
 
 The script prints the job ID and waits for the result. The queue can take
 from minutes to hours. The results can also be fetched later:
@@ -147,6 +154,27 @@ The QFT on the same models, fraction of runs that read back the number K:
 
 After compilation the QFT circuits have 9 two-qubit gates each, more than
 the others, hence the lower results.
+
+Grover's search on the same models, fraction of runs that found the marked
+number K:
+
+| Processor | 2 qubits: 0 | 1 | 2 | 3 |
+|---|---:|---:|---:|---:|
+| Brisbane | 96.4% | 95.8% | 95.5% | 95.3% |
+| Torino | 97.7% | 97.4% | 97.4% | 97.5% |
+| Fez | 99.4% | 98.6% | 99.0% | 97.7% |
+
+| Processor | 3 qubits: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | Average |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Brisbane | 72.8% | 72.6% | 75.0% | 76.1% | 72.7% | 72.5% | 75.1% | 75.0% | 74.0% |
+| Torino | 81.9% | 80.7% | 79.3% | 80.5% | 81.2% | 81.5% | 80.3% | 79.5% | 80.6% |
+| Fez | 83.7% | 82.9% | 83.2% | 83.0% | 82.3% | 82.7% | 82.3% | 81.7% | 82.7% |
+
+On two qubits the search has only 2 two-qubit gates: the CZ of the oracle and
+the CZ of the diffusion. On three qubits each of the four CCZ gates becomes
+six CNOTs, and three qubits on the processor are never all connected to each
+other, so the compiler adds swaps: 37 two-qubit gates in all. Even so the
+ideal result is 94.5%, not 100%.
 
 Results on real hardware will probably be somewhat lower:
 

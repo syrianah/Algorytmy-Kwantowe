@@ -5,6 +5,7 @@
 
 include "../qasm.rl"
 include "../qft.rl"
+include "../grover.rl"
 include "circuits.rl"
 
 // Fixed seed: the same psi angles on every generation.
@@ -29,3 +30,15 @@ qft_4()
 qft_5()
 qft_6()
 qft_7()
+grover2_0()
+grover2_1()
+grover2_2()
+grover2_3()
+grover3_0()
+grover3_1()
+grover3_2()
+grover3_3()
+grover3_4()
+grover3_5()
+grover3_6()
+grover3_7()

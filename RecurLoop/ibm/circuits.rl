@@ -186,3 +186,63 @@ circuit qft_6 {
 circuit qft_7 {
     return phase_readout(qs, 7)
 }
+
+// Grover's search: the oracle hides the marked number k and only flips the
+// sign of |k>. On two qubits (four numbers) one iteration finds k with
+// certainty; on three qubits (eight numbers) two iterations find it with
+// probability 94.5%. The grover2_K and grover3_K circuits search for K.
+// Needs grover.rl.
+fn grover_search(qs:i64, n:i64, k:i64, iterations:i64) -> i64 {
+    qubits r[n]
+    grover(qs, r, n, k, iterations)
+    measure all r -> found
+    return found
+}
+
+circuit grover2_0 {
+    return grover_search(qs, 2, 0, 1)
+}
+
+circuit grover2_1 {
+    return grover_search(qs, 2, 1, 1)
+}
+
+circuit grover2_2 {
+    return grover_search(qs, 2, 2, 1)
+}
+
+circuit grover2_3 {
+    return grover_search(qs, 2, 3, 1)
+}
+
+circuit grover3_0 {
+    return grover_search(qs, 3, 0, 2)
+}
+
+circuit grover3_1 {
+    return grover_search(qs, 3, 1, 2)
+}
+
+circuit grover3_2 {
+    return grover_search(qs, 3, 2, 2)
+}
+
+circuit grover3_3 {
+    return grover_search(qs, 3, 3, 2)
+}
+
+circuit grover3_4 {
+    return grover_search(qs, 3, 4, 2)
+}
+
+circuit grover3_5 {
+    return grover_search(qs, 3, 5, 2)
+}
+
+circuit grover3_6 {
+    return grover_search(qs, 3, 6, 2)
+}
+
+circuit grover3_7 {
+    return grover_search(qs, 3, 7, 2)
+}

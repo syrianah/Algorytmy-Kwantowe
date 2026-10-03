@@ -9,7 +9,16 @@ TELEPORTATION = ["teleportation", "teleportation_deferred", "control"]
 SUPERDENSE = ["superdense_00", "superdense_01", "superdense_10", "superdense_11"]
 CHSH = ["chsh_00", "chsh_01", "chsh_10", "chsh_11"]
 QFT = [f"qft_{k}" for k in range(8)]
-CIRCUITS = TELEPORTATION + SUPERDENSE + CHSH + QFT
+GROVER = [f"grover2_{k}" for k in range(4)] + [f"grover3_{k}" for k in range(8)]
+CIRCUITS = TELEPORTATION + SUPERDENSE + CHSH + QFT + GROVER
+SETS = {
+    "all": CIRCUITS,
+    "teleportation": TELEPORTATION,
+    "superdense": SUPERDENSE,
+    "chsh": CHSH,
+    "qft": QFT,
+    "grover": GROVER,
+}
 
 
 def load(name):
@@ -45,6 +54,8 @@ def score(name, data, shots):
         return score_chsh(name, data, shots)
     if name.startswith("qft_"):
         return score_qft(name, data, shots)
+    if name.startswith("grover"):
+        return score_grover(name, data, shots)
     return score_expect(name, data, shots)
 
 
@@ -116,3 +127,15 @@ def score_qft(name, data, shots):
     """
     k = int(name.removeprefix("qft_"))
     return register_values(data).count(k) / shots
+
+
+def score_grover(name, data, shots):
+    """Returns the fraction of runs in which Grover's search found the marked number.
+
+    The register size and the number are in the circuit name: grover3_5 searches
+    for 5 among eight numbers. Guessing would be right 25% of the time on two
+    qubits and 12.5% on three.
+    """
+    k = int(name.split("_")[1])
+    found = [int(bits, 2) for bits in data.found.get_bitstrings()]
+    return found.count(k) / shots
