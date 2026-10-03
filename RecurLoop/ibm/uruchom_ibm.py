@@ -4,7 +4,9 @@ Domyślnie tylko łączy się z kontem, wybiera procesor i kompiluje obwody,
 nic nie wysyłając. Zadanie trafia do kolejki dopiero z flagą --wyslij,
 bo czas na prawdziwym sprzęcie jest ograniczony.
 
-Konto zapisuje się raz, poleceniem w Pythonie:
+Klucz API jest czytany ze zmiennej środowiskowej IBM_QUANTUM_TOKEN, a opcjonalna
+instancja z IBM_QUANTUM_INSTANCE. Bez tych zmiennych używane jest konto
+zapisane wcześniej poleceniem w Pythonie:
   from qiskit_ibm_runtime import QiskitRuntimeService
   QiskitRuntimeService.save_account(
       channel="ibm_quantum_platform", token="TWÓJ_KLUCZ_API", set_as_default=True)
@@ -17,6 +19,7 @@ Użycie, z katalogu ibm, po wygenerowaniu plików .qasm:
 """
 
 import argparse
+import os
 
 from qiskit import transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
@@ -32,7 +35,7 @@ def main():
     parser.add_argument("--zadanie", help="pobierz wyniki zadania o podanym ID")
     args = parser.parse_args()
 
-    serwis = QiskitRuntimeService()
+    serwis = polacz()
 
     if args.zadanie:
         zadanie = serwis.job(args.zadanie)
@@ -60,6 +63,18 @@ def main():
     print(f"\nWysłano zadanie {zadanie.job_id()}. Czekam na wynik, co może potrwać.")
     print(f"Wyniki można też pobrać później: python3 uruchom_ibm.py --zadanie {zadanie.job_id()}")
     pokaz_wyniki(zadanie.result(), OBWODY, args.strzaly)
+
+
+def polacz():
+    """Łączy z IBM Quantum kluczem ze zmiennej środowiskowej albo zapisanym kontem."""
+    token = os.environ.get("IBM_QUANTUM_TOKEN")
+    if token:
+        return QiskitRuntimeService(
+            channel="ibm_quantum_platform",
+            token=token,
+            instance=os.environ.get("IBM_QUANTUM_INSTANCE") or None,
+        )
+    return QiskitRuntimeService()
 
 
 def pokaz_wyniki(wynik, nazwy, strzaly):

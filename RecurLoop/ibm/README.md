@@ -60,6 +60,9 @@ QiskitRuntimeService.save_account(
     channel="ibm_quantum_platform", token="TWÓJ_KLUCZ_API", set_as_default=True)
 ```
 
+Zamiast zapisywać konto, można ustawić zmienną środowiskową
+`IBM_QUANTUM_TOKEN` z kluczem i opcjonalnie `IBM_QUANTUM_INSTANCE`.
+
 **5. Sprawdź połączenie.** Bez flagi `--wyslij` skrypt tylko wybiera procesor
 i kompiluje obwody, niczego nie wysyłając.
 
