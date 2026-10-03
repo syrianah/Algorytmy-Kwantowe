@@ -128,7 +128,9 @@ Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
 Każdy wynik wyraźnie powyżej 50% pokazuje, że teleportacja działa. Różnica
 między `kontrola` a obwodami teleportacji to koszt samego protokołu.
 
-## Wynik na prawdziwym sprzęcie
+## Wyniki na prawdziwym sprzęcie
+
+### Teleportacja
 
 3 października 2026 obwody uruchomiono na procesorze `ibm_kingston`
 (156 kubitów), po 4000 przebiegów każdego obwodu. Zadanie
@@ -166,6 +168,32 @@ Co z tego wynika:
   się znoszące, więc został sam pomiar.
 - **Wynik jest najbliżej modelu Brisbane**, czyli bliżej najsłabszego
   z modeli szumu, choć Kingston jest procesorem nowszej generacji.
+
+### Kodowanie supergęste
+
+Tego samego dnia cztery obwody kodowania supergęstego uruchomiono na
+procesorze `ibm_fez` (156 kubitów), po 4000 przebiegów każdego. Zadanie
+`db0533lj371s73dntdm0` zajęło 6 sekund czasu procesora.
+
+| Wysłana wiadomość | Bob odczytał 00 | 01 | 10 | 11 | Sukces | Model Fez |
+|---|---:|---:|---:|---:|---:|---:|
+| 00 | **3861** | 63 | 58 | 18 | 96,5% | 99,3% |
+| 01 | 40 | **3918** | 10 | 32 | 98,0% | 98,4% |
+| 10 | 76 | 15 | **3822** | 87 | 95,5% | 98,7% |
+| 11 | 10 | 58 | 53 | **3879** | 97,0% | 97,9% |
+
+Co z tego wynika:
+
+- **Jeden kubit przenosi dwa bity.** Bob odczytuje właściwą wiadomość
+  średnio w 96,8% przebiegów. Zgadując, trafiałby w 25%.
+- **Błędy dotyczą zwykle jednego bitu.** Odczyt różniący się od wiadomości
+  na obu bitach naraz zdarza się od 10 do 18 razy na 4000 przebiegów. To
+  pasuje do niezależnych błędów bramek i odczytu na każdym kubicie.
+- **Sprzęt wypadł o 0,4 do 3,2 punktu gorzej od modelu Fez.** Model pochodzi
+  ze starszej kalibracji, a parametry procesora zmieniają się z dnia na dzień.
+- **Bariery są konieczne.** Bez `barrier alicja, bob` kompilator zamieniłby
+  każdy z tych obwodów w bramki X przed pomiarem. Wynik byłby wtedy prawie
+  idealny, ale bez splątania, więc nie świadczyłby o niczym.
 
 ## Konto i limity
 
