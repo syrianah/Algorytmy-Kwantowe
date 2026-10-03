@@ -107,6 +107,45 @@ Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
 Każdy wynik wyraźnie powyżej 50% pokazuje, że teleportacja działa. Różnica
 między `kontrola` a obwodami teleportacji to koszt samego protokołu.
 
+## Wynik na prawdziwym sprzęcie
+
+3 października 2026 obwody uruchomiono na procesorze `ibm_kingston`
+(156 kubitów), po 4000 przebiegów każdego obwodu. Zadanie
+`db04selj371s73dnt1p0` zajęło 5 sekund czasu procesora.
+
+| Obwód | Sukces na `ibm_kingston` |
+|---|---:|
+| teleportacja | 94,5% |
+| teleportacja_odroczona | 96,4% |
+| kontrola | 98,9% |
+
+Wyniki obwodu `teleportacja` w podziale na pomiary Alicji:
+
+| m1 m2 | Liczba przebiegów | Korekta na kubicie Boba | Sukces |
+|---|---:|---|---:|
+| 00 | 1023 | brak | 92,5% |
+| 01 | 1019 | X | 95,2% |
+| 10 | 1042 | Z | 94,5% |
+| 11 | 916 | X i Z | 95,7% |
+
+Co z tego wynika:
+
+- **Teleportacja działa na prawdziwym sprzęcie.** Stan psi trafia do Boba
+  w około 95% przypadków. Odchylenie standardowe przy 4000 przebiegach to
+  około 0,4 punktu procentowego.
+- **Korekty sterowane pomiarem działają.** Każdy z czterech wyników Alicji
+  pojawia się w około 25% przebiegów i we wszystkich czterech przypadkach Bob
+  dostaje poprawny stan. Bez korekt X i Z trzy z czterech gałęzi dałyby wynik
+  bliski losowemu.
+- **Obwód dynamiczny wypada gorzej od odroczonego** o około 2 punkty, mimo
+  że ma mniej bramek dwukubitowych (2 wobec 7). To koszt czekania kubitu Boba
+  na pomiar i decyzję procesora, o którym mowa wyżej.
+- **Około 1,1% błędów to sam odczyt.** Tyle wynosi błąd obwodu `kontrola`,
+  w którym kompilator usunął przygotowanie i odwrócenie stanu jako wzajemnie
+  się znoszące, więc został sam pomiar.
+- **Wynik jest najbliżej modelu Brisbane**, czyli bliżej najsłabszego
+  z modeli szumu, choć Kingston jest procesorem nowszej generacji.
+
 ## Konto i limity
 
 Darmowy plan IBM Quantum daje ograniczony czas na prawdziwych procesorach

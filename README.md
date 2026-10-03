@@ -5,7 +5,9 @@ język obwodów kwantowych zbudowany w
 [RecurLoop](https://github.com/RecurLoop/RecurLoop), w którym bramki,
 pomiary i bloki `circuit` są nowymi konstrukcjami języka. Obwody można
 symulować albo skompilować do OpenQASM 3 i uruchomić na komputerze
-kwantowym IBM.
+kwantowym IBM. Teleportacja napisana w tym języku zadziałała na procesorze
+`ibm_kingston` z sukcesem około 95%
+([wyniki](RecurLoop/ibm/README.md#wynik-na-prawdziwym-sprzęcie)).
 
 ```rl
 circuit teleportacja {
