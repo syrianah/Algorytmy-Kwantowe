@@ -142,6 +142,34 @@ circuit test_cz {
     check approx(p, 1.0) == 1
 }
 
+// CP(pi) z kontrolą w stanie 1 działa jak CZ, a z kontrolą 0 nic nie robi
+circuit test_cp {
+    qubit a
+    qubit b
+    qubit c
+    X a
+    H b
+    CP(pi()) a, b
+    CP(pi()) c, b
+    H b
+    probability b -> p
+    check approx(p, 1.0) == 1
+}
+
+// Rejestr: kubity r[0], r[1], ... i pomiar całego rejestru do liczby
+circuit test_register {
+    qubit a
+    qubits r[4]
+    X a
+    X r[1]
+    X r[3]
+    barrier r[0], r[3]
+    measure all r -> x
+    check x == 10
+    measure a -> m
+    check m == 1
+}
+
 // Reset sprowadza kubit do |0>
 circuit test_reset {
     qubit q
@@ -206,6 +234,8 @@ test_cnot()
 test_swap()
 test_toffoli()
 test_cz()
+test_cp()
+test_register()
 test_reset()
 test_fidelity()
 test_when()

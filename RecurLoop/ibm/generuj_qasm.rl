@@ -3,6 +3,7 @@
 //   recurloop --file generuj_qasm.rl
 
 include "../qasm.rl"
+include "../qft.rl"
 include "obwody.rl"
 
 // Stałe ziarno: te same kąty stanu psi przy każdym generowaniu.
@@ -19,3 +20,11 @@ chsh_00()
 chsh_01()
 chsh_10()
 chsh_11()
+qft_0()
+qft_1()
+qft_2()
+qft_3()
+qft_4()
+qft_5()
+qft_6()
+qft_7()

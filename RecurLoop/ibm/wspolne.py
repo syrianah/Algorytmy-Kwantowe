@@ -8,7 +8,8 @@ KATALOG = Path(__file__).resolve().parent
 TELEPORTACJA = ["teleportacja", "teleportacja_odroczona", "kontrola"]
 SUPERDENSE = ["superdense_00", "superdense_01", "superdense_10", "superdense_11"]
 CHSH = ["chsh_00", "chsh_01", "chsh_10", "chsh_11"]
-OBWODY = TELEPORTACJA + SUPERDENSE + CHSH
+QFT = [f"qft_{k}" for k in range(8)]
+OBWODY = TELEPORTACJA + SUPERDENSE + CHSH + QFT
 
 
 def wczytaj(nazwa):
@@ -30,6 +31,8 @@ def podsumuj(nazwa, dane, strzaly):
         return podsumuj_superdense(nazwa, dane, strzaly)
     if nazwa.startswith("chsh_"):
         return podsumuj_chsh(nazwa, dane, strzaly)
+    if nazwa.startswith("qft_"):
+        return podsumuj_qft(nazwa, dane, strzaly)
     return podsumuj_expect(nazwa, dane, strzaly)
 
 
@@ -84,3 +87,18 @@ def wartosc_s(sukcesy):
     Klasycznie S <= 2, mechanika kwantowa pozwala na S = 2 sqrt(2) = 2,83.
     """
     return 8 * sum(sukcesy) / len(sukcesy) - 4
+
+
+def odczyty_rejestru(dane):
+    """Zwraca listę liczb odczytanych z rejestru wynik, bit k to kubit r[k]."""
+    return [int(bity, 2) for bity in dane.wynik.get_bitstrings()]
+
+
+def podsumuj_qft(nazwa, dane, strzaly):
+    """Zwraca odsetek przebiegów, w których QFT odwrotna oddała zapisaną liczbę.
+
+    Liczba jest w nazwie obwodu: qft_5 zapisuje w fazach 5. Zgadując jedną
+    z ośmiu liczb, trafiałoby się w 12,5% przebiegów.
+    """
+    k = int(nazwa.removeprefix("qft_"))
+    return odczyty_rejestru(dane).count(k) / strzaly

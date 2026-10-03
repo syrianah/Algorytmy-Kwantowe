@@ -46,15 +46,25 @@ record Qasm:Reg {
     phi:f64*
     indent:i64
     out:u8*
+    indices:i64*
+    sizes:i64*
 }
 
 let Qasm:new = fn (name:u8*) -> i64 {
-    var r:Qasm:Reg* = cast(Qasm:Reg*, malloc(48))
+    var r:Qasm:Reg* = cast(Qasm:Reg*, malloc(64))
     r.n = 0
     r.names = cast(u8**, malloc(8 * 64))
     r.theta = cast(f64*, malloc(8 * 64))
     r.phi = cast(f64*, malloc(8 * 64))
     r.indent = 0
+    r.indices = cast(i64*, malloc(8 * 64))
+    r.sizes = cast(i64*, malloc(8 * 64))
+    var k = 0
+    while k < 64 {
+        r.indices[k] = k
+        r.sizes[k] = 1
+        k += 1
+    }
     var path:u8* = malloc(512)
     snprintf(path, 512, "%s.qasm", name)
     r.out = fopen(path, "w")
@@ -80,6 +90,8 @@ let Qasm:release = fn (h:i64) -> i64 {
     free(cast(u8*, r.names))
     free(cast(u8*, r.theta))
     free(cast(u8*, r.phi))
+    free(cast(u8*, r.indices))
+    free(cast(u8*, r.sizes))
     free(cast(u8*, r))
     return 0
 }
@@ -107,6 +119,25 @@ let Qasm:alloc = fn (h:i64, name:u8*) -> i64 {
     return r.n - 1
 }
 
+// Rejestr w OpenQASM 3: `qubit[count] name;`, kubity to name[0], name[1], ...
+// Zwraca wskaźnik do tablicy indeksów, tak jak Quantum:alloc_reg.
+let Qasm:alloc_reg = fn (h:i64, name:u8*, count:i64) -> i64* {
+    var r:Qasm:Reg* = cast(Qasm:Reg*, h)
+    var first = r.n
+    fprintf(Qasm:out(h), "qubit[%lld] %s;\n", count, name)
+    var label:u8* = malloc(64)
+    var k = 0
+    while k < count {
+        snprintf(label, 64, "%s[%lld]", name, k)
+        r.names[r.n] = strdup(label)
+        r.n = r.n + 1
+        k += 1
+    }
+    free(label)
+    r.sizes[first] = count
+    return cast(i64*, cast(i64, r.indices) + 8 * first)
+}
+
 let Qasm:nm = fn (h:i64, q:i64) -> u8* {
     var r:Qasm:Reg* = cast(Qasm:Reg*, h)
     return r.names[q]
@@ -130,6 +161,12 @@ let Qasm:g2 = fn (h:i64, gate:u8*, a:i64, b:i64) -> i64 {
     return 0
 }
 
+let Qasm:g2a = fn (h:i64, gate:u8*, angle:f64, a:i64, b:i64) -> i64 {
+    Qasm:pad(h)
+    fprintf(Qasm:out(h), "%s(%.17g) %s, %s;\n", gate, angle, Qasm:nm(h, a), Qasm:nm(h, b))
+    return 0
+}
+
 let Qasm:g3 = fn (h:i64, gate:u8*, a:i64, b:i64, c:i64) -> i64 {
     Qasm:pad(h)
     fprintf(Qasm:out(h), "%s %s, %s, %s;\n", gate, Qasm:nm(h, a), Qasm:nm(h, b), Qasm:nm(h, c))
@@ -141,6 +178,21 @@ let Qasm:do_measure = fn (h:i64, t:i64, bit:u8*) -> i64 {
     fprintf(Qasm:out(h), "bit[1] %s;\n", bit)
     Qasm:pad(h)
     fprintf(Qasm:out(h), "%s[0] = measure %s;\n", bit, Qasm:nm(h, t))
+    return 0
+}
+
+// Pomiar całego rejestru do zmiennej bitowej o tej samej długości.
+let Qasm:read_reg = fn (h:i64, r:i64*, bit:u8*) -> i64 {
+    var reg:Qasm:Reg* = cast(Qasm:Reg*, h)
+    var count = reg.sizes[r[0]]
+    Qasm:pad(h)
+    fprintf(Qasm:out(h), "bit[%lld] %s;\n", count, bit)
+    var k = 0
+    while k < count {
+        Qasm:pad(h)
+        fprintf(Qasm:out(h), "%s[%lld] = measure %s;\n", bit, k, Qasm:nm(h, r[k]))
+        k += 1
+    }
     return 0
 }
 
@@ -221,6 +273,7 @@ syntax extend circuit <name:id> "(" <params:raw> ")" <body:block> => fn ${name}(
 }
 
 syntax qubit <name:id> => var ${name} = Qasm:alloc(qs, "${name}")
+syntax qubits <name:id> "[" <count:expr> "]" => var ${name}:i64* = Qasm:alloc_reg(qs, "${name}", ${count})
 syntax seed <value:expr> => qasm_seed(${value})
 
 syntax H <t:expr> => Qasm:g1(qs, "h", ${t})
@@ -235,11 +288,13 @@ syntax RZ "(" <angle:expr> ")" <t:expr> => Qasm:g1a(qs, "rz", ${angle}, ${t})
 syntax P "(" <angle:expr> ")" <t:expr> => Qasm:g1a(qs, "p", ${angle}, ${t})
 syntax CNOT <c:expr> "," <t:expr> => Qasm:g2(qs, "cx", ${c}, ${t})
 syntax CZ <c:expr> "," <t:expr> => Qasm:g2(qs, "cz", ${c}, ${t})
+syntax CP "(" <angle:expr> ")" <c:expr> "," <t:expr> => Qasm:g2a(qs, "cp", ${angle}, ${c}, ${t})
 syntax SWAP <a:expr> "," <b:expr> => Qasm:g2(qs, "swap", ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Qasm:g3(qs, "ccx", ${c1}, ${c2}, ${t})
 syntax barrier <a:expr> "," <b:expr> => Qasm:g2(qs, "barrier", ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Qasm:do_measure(qs, ${t}, "${name}")
+syntax extend measure all <r:id> "->" <name:id> => var ${name} = Qasm:read_reg(qs, ${r}, "${name}")
 syntax reset <t:expr> => Qasm:g1(qs, "reset", ${t})
 syntax prepare <t:expr> random => Qasm:init_random(qs, ${t})
 syntax extend prepare <t:expr> "(" <theta:expr> "," <phi:expr> ")" => Qasm:init_state(qs, ${t}, ${theta}, ${phi})

@@ -17,6 +17,7 @@ Użycie, z katalogu ibm, po wygenerowaniu plików .qasm:
   python3 uruchom_ibm.py --procesor ibm_fez --wyslij
   python3 uruchom_ibm.py --zestaw superdense --wyslij   # tylko kodowanie supergęste
   python3 uruchom_ibm.py --zestaw chsh --wyslij         # tylko gra CHSH
+  python3 uruchom_ibm.py --zestaw qft --wyslij          # tylko transformata Fouriera
   python3 uruchom_ibm.py --zadanie ID        # pobiera wyniki wysłanego wcześniej zadania
                                              # (z tym samym --zestaw co przy wysyłaniu)
 """
@@ -28,9 +29,9 @@ from collections import Counter
 from qiskit import transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
 
-from wspolne import CHSH, OBWODY, SUPERDENSE, TELEPORTACJA, odczyty_boba, podsumuj, wartosc_s, wczytaj
+from wspolne import CHSH, OBWODY, QFT, SUPERDENSE, TELEPORTACJA, odczyty_boba, podsumuj, wartosc_s, wczytaj
 
-ZESTAWY = {"wszystko": OBWODY, "teleportacja": TELEPORTACJA, "superdense": SUPERDENSE, "chsh": CHSH}
+ZESTAWY = {"wszystko": OBWODY, "teleportacja": TELEPORTACJA, "superdense": SUPERDENSE, "chsh": CHSH, "qft": QFT}
 
 
 def main():
@@ -98,8 +99,9 @@ def pokaz_wyniki(wynik, nazwy, strzaly):
     if all(n in sukcesy for n in CHSH):
         print(f"\n  CHSH: S = {wartosc_s([sukcesy[n] for n in CHSH]):.3f}"
               " (klasycznie najwyżej 2, idealnie 2,828)")
-    print("\nNa idealnym sprzęcie teleportacja i kodowanie supergęste dają 100%, a gra CHSH 85,4%.")
-    print("Losowy wynik to 50% dla teleportacji, 25% dla kodowania supergęstego i 50% dla CHSH.")
+    print("\nNa idealnym sprzęcie teleportacja, kodowanie supergęste i QFT dają 100%, a gra CHSH 85,4%.")
+    print("Losowy wynik to 50% dla teleportacji, 25% dla kodowania supergęstego, 50% dla CHSH")
+    print("i 12,5% dla QFT.")
 
 
 if __name__ == "__main__":

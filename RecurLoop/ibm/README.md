@@ -1,4 +1,4 @@
-# Teleportacja, kodowanie supergęste i CHSH na komputerze kwantowym IBM
+# Protokoły i algorytmy kwantowe na komputerze kwantowym IBM
 
 Te same obwody napisane w naszym języku można symulować albo skompilować do
 OpenQASM 3 i uruchomić na prawdziwym procesorze IBM. Backend wybiera się
@@ -33,6 +33,11 @@ przez dołączoną bibliotekę: `quantum.rl` symuluje, a `qasm.rl` kompiluje.
   Klasycznie da się wygrać najwyżej 75% gier, a z parą splątaną 85,4%.
   Ze średniej wygranych w czterech obwodach liczona jest wartość
   S = 8 * średnia - 4. Klasycznie S <= 2, kwantowo do 2 sqrt(2) = 2,83.
+- **`qft_0` do `qft_7`** to kwantowa transformata Fouriera z biblioteki
+  `../qft.rl`, w roli jaką pełni w estymacji fazy. Liczba K jest zapisana
+  wyłącznie w fazach trzech kubitów, bez splątania. QFT odwrotna zamienia
+  fazy na liczbę, a pomiar rejestru `wynik` powinien dać K. Zgadując,
+  trafiałoby się w 12,5% przebiegów.
 
 Na sprzęcie nie da się odczytać stanu Boba wprost. Dlatego `expect bob == psi`
 odwraca na kubicie Boba przygotowanie stanu psi i mierzy go do bitu
@@ -93,7 +98,8 @@ python3 uruchom_ibm.py --wyslij
 ```
 
 Domyślnie wysyłane są wszystkie obwody. Flaga `--zestaw teleportacja` albo
-`--zestaw superdense` albo `--zestaw chsh` wybiera tylko jedną grupę.
+`--zestaw superdense`, `--zestaw chsh` albo `--zestaw qft` wybiera tylko
+jedną grupę.
 
 Skrypt wypisze identyfikator zadania i poczeka na wynik. Kolejka może trwać
 od minut do godzin. Wyniki można też pobrać później:
@@ -127,6 +133,17 @@ Gra CHSH na tych samych modelach, wygrane dla pytań x y i wartość S:
 | Brisbane | 83,9% | 84,0% | 82,2% | 83,4% | 2,670 |
 | Torino | 84,1% | 84,8% | 83,2% | 84,4% | 2,729 |
 | Fez | 84,8% | 83,8% | 84,5% | 84,7% | 2,754 |
+
+QFT na tych samych modelach, odsetek przebiegów z odczytaną liczbą K:
+
+| Procesor | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | Średnio |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Brisbane | 91,1% | 90,7% | 90,4% | 91,8% | 91,5% | 90,3% | 90,7% | 92,1% | 91,1% |
+| Torino | 94,0% | 93,6% | 94,0% | 93,0% | 93,5% | 91,9% | 93,7% | 92,9% | 93,3% |
+| Fez | 97,2% | 95,9% | 95,5% | 95,0% | 96,2% | 95,6% | 95,7% | 94,0% | 95,6% |
+
+Obwody QFT po kompilacji mają po 9 bramek dwukubitowych, więcej niż
+pozostałe, stąd niższe wyniki.
 
 Na prawdziwym sprzęcie wyniki będą prawdopodobnie trochę niższe:
 

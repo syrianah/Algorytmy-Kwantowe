@@ -34,6 +34,7 @@ extern realloc(pointer:u8*, size:u64) -> u8* abi sysv-amd64
 extern free(pointer:u8*) -> void abi sysv-amd64
 extern strdup(text:u8*) -> u8* abi sysv-amd64
 extern printf(format:u8*, ...) -> i64 abi sysv-amd64
+extern snprintf(out:u8*, size:u64, format:u8*, ...) -> i64 abi sysv-amd64
 extern time(out:u8*) -> i64 abi sysv-amd64
 extern srand48(seed:i64) -> void abi sysv-amd64
 extern drand48() -> f64 abi sysv-amd64
@@ -60,6 +61,8 @@ record Quantum:State {
     theta:f64*
     phi:f64*
     prepared:i64*
+    indices:i64*
+    sizes:i64*
 }
 
 // -----------------------------------------------------------------------------
@@ -95,7 +98,7 @@ let Quantum:name = fn (handle:i64, t:i64) -> u8* {
 // -----------------------------------------------------------------------------
 
 let Quantum:new = fn () -> i64 {
-    var s:Quantum:State* = cast(Quantum:State*, malloc(64))
+    var s:Quantum:State* = cast(Quantum:State*, malloc(80))
     s.n = 0
     s.size = 1
     s.re = cast(f64*, malloc(8))
@@ -107,6 +110,15 @@ let Quantum:new = fn () -> i64 {
     s.theta = cast(f64*, malloc(cast(u64, limit * 8)))
     s.phi = cast(f64*, malloc(cast(u64, limit * 8)))
     s.prepared = cast(i64*, malloc(cast(u64, limit * 8)))
+    // indices[k] = k. Rejestr kubitów to wskaźnik w środek tej tablicy.
+    s.indices = cast(i64*, malloc(cast(u64, limit * 8)))
+    s.sizes = cast(i64*, malloc(cast(u64, limit * 8)))
+    var k = 0
+    while k < limit {
+        s.indices[k] = k
+        s.sizes[k] = 1
+        k += 1
+    }
     return cast(i64, s)
 }
 
@@ -123,6 +135,8 @@ let Quantum:release = fn (handle:i64) -> i64 {
     free(cast(u8*, s.theta))
     free(cast(u8*, s.phi))
     free(cast(u8*, s.prepared))
+    free(cast(u8*, s.indices))
+    free(cast(u8*, s.sizes))
     free(cast(u8*, s))
     return 0
 }
@@ -152,6 +166,23 @@ let Quantum:alloc = fn (handle:i64, name:u8*) -> i64 {
     s.n = s.n + 1
     s.size = new_size
     return index
+}
+
+// Rejestr count kubitów o nazwach name[0], name[1], ... Zwraca wskaźnik do
+// tablicy ich indeksów, więc w obwodzie r[k] to indeks k-tego kubitu rejestru.
+let Quantum:alloc_reg = fn (handle:i64, name:u8*, count:i64) -> i64* {
+    var s:Quantum:State* = cast(Quantum:State*, handle)
+    var first = s.n
+    var label:u8* = malloc(64)
+    var k = 0
+    while k < count {
+        snprintf(label, 64, "%s[%lld]", name, k)
+        Quantum:alloc(handle, label)
+        k += 1
+    }
+    free(label)
+    s.sizes[first] = count
+    return cast(i64*, cast(i64, s.indices) + 8 * first)
 }
 
 // -----------------------------------------------------------------------------
@@ -310,6 +341,20 @@ let Quantum:do_measure = fn (handle:i64, t:i64) -> i64 {
         i += 1
     }
     return outcome
+}
+
+// Pomiar całego rejestru. Kubit r[k] daje bit k wyniku, czyli wynik to
+// liczba zapisana w rejestrze, z r[0] jako najmniej znaczącym bitem.
+let Quantum:read_reg = fn (handle:i64, r:i64*) -> i64 {
+    var s:Quantum:State* = cast(Quantum:State*, handle)
+    var count = s.sizes[r[0]]
+    var value = 0
+    var k = 0
+    while k < count {
+        value += Quantum:do_measure(handle, r[k]) * Quantum:pow2(k)
+        k += 1
+    }
+    return value
 }
 
 let Quantum:do_reset = fn (handle:i64, t:i64) -> i64 {
@@ -504,6 +549,7 @@ syntax extend experiment <name:id> "(" <params:raw> ")" <body:block> => fn ${nam
 }
 
 syntax qubit <name:id> => var ${name} = Quantum:alloc(qs, "${name}")
+syntax qubits <name:id> "[" <count:expr> "]" => var ${name}:i64* = Quantum:alloc_reg(qs, "${name}", ${count})
 
 syntax seed <value:expr> => quantum_seed(${value})
 
@@ -520,11 +566,13 @@ syntax P "(" <angle:expr> ")" <t:expr> => Quantum:phase(qs, 0 - 1, ${t}, ${angle
 
 syntax CNOT <c:expr> "," <t:expr> => Quantum:x(qs, ${c}, 0 - 1, ${t})
 syntax CZ <c:expr> "," <t:expr> => Quantum:z(qs, ${c}, ${t})
+syntax CP "(" <angle:expr> ")" <c:expr> "," <t:expr> => Quantum:phase(qs, ${c}, ${t}, ${angle})
 syntax SWAP <a:expr> "," <b:expr> => Quantum:swap(qs, ${a}, ${b})
 syntax TOFFOLI <c1:expr> "," <c2:expr> "," <t:expr> => Quantum:x(qs, ${c1}, ${c2}, ${t})
 syntax barrier <a:expr> "," <b:expr> => Quantum:fence(qs, ${a}, ${b})
 
 syntax measure <t:id> "->" <name:id> => var ${name} = Quantum:do_measure(qs, ${t})
+syntax extend measure all <r:id> "->" <name:id> => var ${name} = Quantum:read_reg(qs, ${r})
 syntax probability <t:id> "->" <name:id> => var ${name} = Quantum:prob_one(qs, ${t})
 syntax fidelity <t:id> "," <ref:id> "->" <name:id> => var ${name} = Quantum:get_fidelity(qs, ${t}, ${ref})
 syntax reset <t:expr> => Quantum:do_reset(qs, ${t})

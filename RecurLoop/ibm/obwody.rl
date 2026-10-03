@@ -140,3 +140,46 @@ circuit chsh_10 {
 circuit chsh_11 {
     return chsh(qs, 1, 1)
 }
+
+// Kwantowa transformata Fouriera, jądro estymacji fazy: liczba k od 0 do 7
+// jest zapisana tylko w fazach trzech kubitów, a QFT odwrotna zamienia ją
+// na wynik pomiaru. Obwody qft_K odczytują liczbę K. Wymaga qft.rl.
+fn odczyt_fazy(qs:i64, k:i64) -> i64 {
+    qubits r[3]
+    koduj_fourier(qs, r, 3, k)
+    qft_odwrotna(qs, r, 3)
+    measure all r -> wynik
+    return wynik
+}
+
+circuit qft_0 {
+    return odczyt_fazy(qs, 0)
+}
+
+circuit qft_1 {
+    return odczyt_fazy(qs, 1)
+}
+
+circuit qft_2 {
+    return odczyt_fazy(qs, 2)
+}
+
+circuit qft_3 {
+    return odczyt_fazy(qs, 3)
+}
+
+circuit qft_4 {
+    return odczyt_fazy(qs, 4)
+}
+
+circuit qft_5 {
+    return odczyt_fazy(qs, 5)
+}
+
+circuit qft_6 {
+    return odczyt_fazy(qs, 6)
+}
+
+circuit qft_7 {
+    return odczyt_fazy(qs, 7)
+}

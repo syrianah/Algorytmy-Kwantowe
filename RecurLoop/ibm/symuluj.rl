@@ -1,11 +1,13 @@
 // Symuluje obwody z obwody.rl biblioteką quantum.rl i sprawdza, że każda
 // teleportacja daje Bobowi właściwy stan, a kodowanie supergęste
 // przekazuje Bobowi dokładnie wysłane bity, a gra CHSH jest wygrywana
-// z prawdopodobieństwem bliskim cos^2(pi/8).
+// z prawdopodobieństwem bliskim cos^2(pi/8), a QFT odwrotna odczytuje liczbę
+// zapisaną w fazach.
 // Uruchomienie z katalogu ibm:
 //   recurloop --file symuluj.rl
 
 include "../quantum.rl"
+include "../qft.rl"
 include "obwody.rl"
 
 experiment symulacja {
@@ -26,6 +28,14 @@ experiment symulacja {
         wygrane_01 += chsh_01()
         wygrane_10 += chsh_10()
         wygrane_11 += chsh_11()
+        check qft_0() == 0
+        check qft_1() == 1
+        check qft_2() == 2
+        check qft_3() == 3
+        check qft_4() == 4
+        check qft_5() == 5
+        check qft_6() == 6
+        check qft_7() == 7
         i += 1
     }
     say "Symulacja: po 10000 przebiegów każdego obwodu, wszystkie sprawdzenia expect spełnione."

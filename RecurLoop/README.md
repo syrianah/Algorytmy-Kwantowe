@@ -55,10 +55,12 @@ recurloop --file przyklady/teleportacja.rl
 |---|---|
 | `quantum.rl` | Silnik symulatora i składnia języka obwodów |
 | `qasm.rl` | Kompilator tych samych obwodów do OpenQASM 3 |
-| `ibm/` | Teleportacja na prawdziwym komputerze kwantowym IBM |
+| `qft.rl` | Kwantowa transformata Fouriera i jej odwrotność, dla obu backendów |
+| `ibm/` | Wszystkie protokoły na prawdziwym komputerze kwantowym IBM |
 | `testy.rl` | Testy wszystkich bramek, pomiaru i wierności |
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
 | `przyklady/chsh.rl` | Gra CHSH ze splątaniem i bez, wartość S i klasyczna granica |
+| `przyklady/qft.rl` | QFT liczby, wykrywanie okresu i odczyt liczby zapisanej w fazach |
 | `przyklady/superdense.rl` | Kodowanie supergęste: cztery wiadomości krok po kroku i 10 000 przebiegów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
 | `uruchom.sh` | Uruchamia testy i przykłady |
@@ -75,6 +77,7 @@ recurloop --file przyklady/teleportacja.rl
 | `experiment nazwa { ... }` | Funkcja natywna bez rejestru, na przykład do statystyk |
 | `experiment nazwa(n:i64) { ... }` | To samo z parametrami |
 | `qubit nazwa` | Nowy kubit w stanie \|0> |
+| `qubits r[n]` | Rejestr n kubitów, kolejne kubity to `r[0]`, `r[1]`, ... W QASM `qubit[n] r;` |
 | `seed 42` | Stałe ziarno losowości, domyślnie ziarno z zegara |
 
 ### Bramki
@@ -86,6 +89,7 @@ recurloop --file przyklady/teleportacja.rl
 | `P(kat) q` | Faza diag(1, e^(i kat)) |
 | `RX(kat) q`, `RY(kat) q`, `RZ(kat) q` | Obroty wokół osi sfery Blocha |
 | `CNOT c, t`, `CZ c, t` | Bramki kontrolowane |
+| `CP(kat) c, t` | Kontrolowana faza: e^(i kat), gdy oba kubity są w stanie 1 |
 | `SWAP a, b` | Zamiana kubitów |
 | `TOFFOLI c1, c2, t` | Podwójnie kontrolowane NOT |
 | `barrier a, b` | Bez działania w symulacji. Na sprzęcie zabrania kompilatorowi upraszczać obwód ponad tym miejscem |
@@ -95,6 +99,7 @@ recurloop --file przyklady/teleportacja.rl
 | Składnia | Znaczenie |
 |---|---|
 | `measure q -> m` | Pomiar z losowaniem według reguły Borna i redukcją stanu |
+| `measure all r -> x` | Pomiar całego rejestru do liczby, `r[0]` to najmłodszy bit |
 | `probability q -> p` | Prawdopodobieństwo wyniku 1 bez pomiaru |
 | `reset q` | Sprowadzenie kubitu do \|0> |
 | `prepare q random` | Losowy stan jednostajnie na sferze Blocha |
@@ -179,7 +184,7 @@ ale warto je zgłosić autorowi języka:
 ## Plany
 
 1. Algorytmy Deutscha-Jozsy i Grovera.
-2. Kwantowa transformata Fouriera.
-3. Rejestry kubitów, na przykład `qubits r[4]`, i bramki na całych rejestrach.
+2. Estymacja fazy i algorytm Shora dla małych liczb, na bazie `qft.rl`.
+3. Bramki na całych rejestrach, na przykład `H all r`.
 4. Eksport bibliotek do obrazów `quantum.rli` i `qasm.rli` ładowanych przez
    `--library`.
