@@ -11,6 +11,10 @@ Ten sam obwód ma dwa backendy, wybierane przez dołączoną bibliotekę:
 - **`qasm.rl`** kompiluje obwód do OpenQASM 3, który można uruchomić na
   komputerze kwantowym IBM. Instrukcja jest w [`ibm/README.md`](ibm/README.md).
 
+Napisane w tym języku teleportacja, kodowanie supergęste, gra CHSH i QFT
+zadziałały na prawdziwych procesorach IBM. Wyniki są w
+[`ibm/README.md`](ibm/README.md#wyniki-na-prawdziwym-sprzęcie).
+
 ```rl
 include "quantum.rl"
 

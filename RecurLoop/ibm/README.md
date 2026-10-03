@@ -161,6 +161,16 @@ między `kontrola` a obwodami teleportacji to koszt samego protokołu.
 
 ## Wyniki na prawdziwym sprzęcie
 
+Podsumowanie. Ostatnia kolumna to wynik losowy albo najlepszy możliwy bez
+splątania. Wszystkie zadania razem zajęły 28 sekund czasu procesora.
+
+| Algorytm | Procesor | Wynik | Bez kwantowej przewagi |
+|---|---|---:|---:|
+| Teleportacja | `ibm_kingston` | 94,5% | 50% |
+| Kodowanie supergęste | `ibm_fez` | 96,8% | 25% |
+| Gra CHSH | `ibm_fez` | S = 2,70 | S ≤ 2 |
+| QFT, odczyt liczby z faz | `ibm_fez` | 90,5% | 12,5% |
+
 ### Teleportacja
 
 3 października 2026 obwody uruchomiono na procesorze `ibm_kingston`
@@ -296,5 +306,8 @@ Co z tego wynika:
 ## Konto i limity
 
 Darmowy plan IBM Quantum daje ograniczony czas na prawdziwych procesorach
-w każdym miesiącu. Ten zestaw zużywa go niewiele: trzy krótkie obwody po
-4000 powtórzeń. Liczbę powtórzeń zmienia flaga `--strzaly`.
+w każdym miesiącu, w planie Open 10 minut. Ten zestaw zużywa go niewiele:
+wszystkie 23 obwody po 4000 powtórzeń zajęły razem 28 sekund (5 sekund
+teleportacja, po 6 kodowanie supergęste i CHSH, 11 QFT). Liczbę powtórzeń
+zmienia flaga `--strzaly`, a flaga `--zestaw` pozwala wysłać tylko jedną
+grupę obwodów.

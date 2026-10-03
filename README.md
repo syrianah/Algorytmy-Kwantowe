@@ -5,12 +5,21 @@ język obwodów kwantowych zbudowany w
 [RecurLoop](https://github.com/RecurLoop/RecurLoop), w którym bramki,
 pomiary i bloki `circuit` są nowymi konstrukcjami języka. Obwody można
 symulować albo skompilować do OpenQASM 3 i uruchomić na komputerze
-kwantowym IBM. Teleportacja napisana w tym języku zadziałała na procesorze
-`ibm_kingston` z sukcesem około 95%, kodowanie supergęste na `ibm_fez`
-z sukcesem około 97%, gra CHSH na `ibm_fez` dała S = 2,70, ponad
-klasyczną granicą 2, a kwantowa transformata Fouriera odczytała liczbę
-zapisaną w fazach w 90,5% przebiegów
-([wyniki](RecurLoop/ibm/README.md#wyniki-na-prawdziwym-sprzęcie)).
+kwantowym IBM.
+
+Wyniki na prawdziwych procesorach IBM, 3 października 2026, po 4000
+przebiegów każdego obwodu. Ostatnia kolumna to wynik losowy albo najlepszy
+możliwy bez splątania. Szczegóły są w
+[`RecurLoop/ibm/README.md`](RecurLoop/ibm/README.md#wyniki-na-prawdziwym-sprzęcie).
+
+| Algorytm | Procesor | Wynik | Bez kwantowej przewagi |
+|---|---|---:|---:|
+| Teleportacja | `ibm_kingston` | 94,5% | 50% |
+| Kodowanie supergęste | `ibm_fez` | 96,8% | 25% |
+| Gra CHSH | `ibm_fez` | S = 2,70 | S ≤ 2 |
+| QFT, odczyt liczby z faz | `ibm_fez` | 90,5% | 12,5% |
+
+Tak wygląda teleportacja w tym języku:
 
 ```rl
 circuit teleportacja {
