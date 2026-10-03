@@ -525,6 +525,10 @@ syntax extend prepare <t:expr> "(" <theta:expr> "," <phi:expr> ")" => Quantum:in
 syntax show "state" => Quantum:print_state(qs)
 syntax extend show bloch <t:expr> => Quantum:print_bloch(qs, ${t})
 
+// Warunek zależny od wyniku pomiaru. W symulatorze działa jak `if`, a w qasm.rl
+// staje się warunkiem wykonywanym na komputerze kwantowym w trakcie obwodu.
+syntax when <bit:id> <body:block> => if ${bit} == 1 ${body}
+
 syntax check <cond:expr> => if !(${cond}) { Quantum:fail(cname, "${cond}") }
 syntax expect <t:expr> "==" <ref:expr> => if Quantum:same(qs, ${t}, ${ref}) == 0 { Quantum:fail(cname, "expect ${t} == ${ref}") }
 

@@ -1,9 +1,11 @@
 # Algorytmy kwantowe
 
 Symulacje algorytmów i protokołów kwantowych. Główną częścią repo jest
-biblioteka obwodów kwantowych w języku
-[RecurLoop](https://github.com/RecurLoop/RecurLoop), w której bramki,
-pomiary i bloki `circuit` są nowymi konstrukcjami języka.
+język obwodów kwantowych zbudowany w
+[RecurLoop](https://github.com/RecurLoop/RecurLoop), w którym bramki,
+pomiary i bloki `circuit` są nowymi konstrukcjami języka. Obwody można
+symulować albo skompilować do OpenQASM 3 i uruchomić na komputerze
+kwantowym IBM.
 
 ```rl
 circuit teleportacja {
@@ -32,6 +34,7 @@ circuit teleportacja {
 | Katalog | Zawartość |
 |---|---|
 | [`RecurLoop`](RecurLoop) | Biblioteka `quantum.rl`, testy i przykłady: stan Bella, teleportacja |
+| [`RecurLoop/ibm`](RecurLoop/ibm) | Kompilacja do OpenQASM 3 i uruchomienie na komputerze kwantowym IBM |
 | [`RecurLoop/benchmark`](RecurLoop/benchmark) | Porównanie wydajności: Python, NumPy, Rust i RecurLoop |
 | [`materialy`](materialy) | Egzamin, listy zadań i schematy protokołów |
 | [`archiwum`](archiwum) | Pierwsze implementacje w Pythonie, Rust i Qiskit |

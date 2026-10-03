@@ -15,4 +15,5 @@ run testy.rl
 for example in przyklady/*.rl; do
     run "$example"
 done
+(cd ibm && run symuluj.rl)
 echo "Wszystko zaliczone."

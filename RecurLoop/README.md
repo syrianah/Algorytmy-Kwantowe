@@ -1,9 +1,15 @@
 # Quantum: obwody kwantowe w RecurLoop
 
-Biblioteka [RecurLoop](https://github.com/RecurLoop/RecurLoop), która dodaje do
-języka składnię obwodów kwantowych i symulator wektora stanu. Bramki, pomiary
-i bloki `circuit` to nowe frazy języka zdefiniowane w samej bibliotece, bez
-zmian w kompilatorze. Każdy obwód kompiluje się do natywnej funkcji.
+Biblioteki [RecurLoop](https://github.com/RecurLoop/RecurLoop), które dodają do
+języka składnię obwodów kwantowych. Bramki, pomiary i bloki `circuit` to nowe
+frazy języka zdefiniowane w samych bibliotekach, bez zmian w kompilatorze.
+
+Ten sam obwód ma dwa backendy, wybierane przez dołączoną bibliotekę:
+
+- **`quantum.rl`** symuluje obwód. Każdy obwód kompiluje się do natywnej
+  funkcji liczącej wektor stanu.
+- **`qasm.rl`** kompiluje obwód do OpenQASM 3, który można uruchomić na
+  komputerze kwantowym IBM. Instrukcja jest w [`ibm/README.md`](ibm/README.md).
 
 ```rl
 include "quantum.rl"
@@ -48,6 +54,8 @@ recurloop --file przyklady/teleportacja.rl
 | Plik | Zawartość |
 |---|---|
 | `quantum.rl` | Silnik symulatora i składnia języka obwodów |
+| `qasm.rl` | Kompilator tych samych obwodów do OpenQASM 3 |
+| `ibm/` | Teleportacja na prawdziwym komputerze kwantowym IBM |
 | `testy.rl` | Testy wszystkich bramek, pomiaru i wierności |
 | `przyklady/bell.rl` | Stan Bella i statystyka pomiarów |
 | `przyklady/teleportacja.rl` | Pełny protokół teleportacji krok po kroku i 10 000 losowych przebiegów |
@@ -97,6 +105,7 @@ recurloop --file przyklady/teleportacja.rl
 | `show state` | Niezerowe amplitudy, kubity w kolejności deklaracji od lewej |
 | `show bloch q` | Wektor Blocha kubitu z macierzy gęstości zredukowanej |
 | `say "tekst"` | Wypisanie tekstu |
+| `when bit { ... }` | Blok wykonywany, gdy zmierzony bit wynosi 1. W QASM działa na sprzęcie |
 | `check warunek` | Kończy program kodem 1, jeśli warunek jest fałszywy |
 | `expect q == ref` | Sprawdza, że wierność q względem ref wynosi 1 |
 
@@ -168,4 +177,5 @@ ale warto je zgłosić autorowi języka:
 2. Algorytmy Deutscha-Jozsy i Grovera.
 3. Kwantowa transformata Fouriera.
 4. Rejestry kubitów, na przykład `qubits r[4]`, i bramki na całych rejestrach.
-5. Eksport biblioteki do obrazu `quantum.rli` ładowanego przez `--library`.
+5. Eksport bibliotek do obrazów `quantum.rli` i `qasm.rli` ładowanych przez
+   `--library`.

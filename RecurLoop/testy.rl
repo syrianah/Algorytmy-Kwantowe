@@ -165,6 +165,24 @@ circuit test_fidelity {
     check approx(f1, 0.5) == 1
 }
 
+// `when` wykonuje blok tylko, gdy zmierzony bit wynosi 1
+circuit test_when {
+    qubit a
+    qubit b
+    qubit c
+    X a
+    measure a -> ma
+    measure b -> mb
+    when ma {
+        X c
+    }
+    when mb {
+        X c
+    }
+    probability c -> p
+    check approx(p, 1.0) == 1
+}
+
 // Stan Bella: wyniki obu pomiarów są zawsze równe. Zwraca wynik pomiaru.
 circuit bell_pair {
     qubit a
@@ -190,6 +208,7 @@ test_toffoli()
 test_cz()
 test_reset()
 test_fidelity()
+test_when()
 
 // Przy 1000 próbach wynik 1 powinien wypaść około 500 razy
 experiment bell_statistics {
